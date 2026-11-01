@@ -26,6 +26,8 @@ echo "logo sheet"
   --virtual-time-budget=4000 --window-size=1600,1000 --screenshot=sheet.png "file://$PWD/sheet.html" 2>/dev/null && echo "  ../explorations/sheet.png")
 (cd ../explorations && "$CHROME" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
   --virtual-time-budget=4000 --window-size=1600,1000 --screenshot=sheet-2.png "file://$PWD/sheet-2.html" 2>/dev/null && echo "  ../explorations/sheet-2.png")
+(cd ../explorations && "$CHROME" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
+  --virtual-time-budget=4000 --window-size=1600,1000 --screenshot=sheet-3.png "file://$PWD/sheet-3.html" 2>/dev/null && echo "  ../explorations/sheet-3.png")
 
 cp product-*.png ../../apps/web/assets/
 cp banner.png ../../apps/web/assets/og.png

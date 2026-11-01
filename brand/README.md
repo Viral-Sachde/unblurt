@@ -29,7 +29,7 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 | [`app-icon.svg`](app-icon.svg) | 1024px app icon. Run `npm run icons` in `apps/desktop` to rebuild every platform size |
 | [`tray.svg`](tray.svg) | Single-colour template icon for the macOS menu bar and the system tray |
 | [`illustrations.mjs`](illustrations.mjs) | Generates the isometric keycap illustration: `node brand/illustrations.mjs apps/web/assets` |
-| [`explorations/`](explorations) | Ten logo directions across two comparison sheets |
+| [`explorations/`](explorations) | Ten logo directions plus five Caret iterations, with comparison sheets |
 | [`creatives/`](creatives) | Product shots, README banner and social preview image |
 
 ## Logo explorations
@@ -57,6 +57,18 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 | 08 | **Focus** | Camera focus brackets locking onto one clear dot |
 | 09 | **Keycap** | The product is one shortcut, so the icon is a key with a u on it |
 | 10 | **Afterimage** | A blurted thought's motion trail settling into one sharp dot above a clean line |
+
+### Round three: Caret, five iterations
+
+<img src="explorations/sheet-3.png" alt="Five iterations of the Caret logo" width="100%" />
+
+| # | Iteration | Idea |
+|---|---|---|
+| 07a | **Clean** | One selection and one cursor, nothing else. The most legible at 16px and in the menu bar |
+| 07b | **Night** | Teal tile with a cream cursor. Stands out in a light dock and matches the site buttons |
+| 07c | **Selected u** | A u whose right stroke is the text cursor, sitting on a highlight |
+| 07d | **Before / after** | A wavy messy line above a clean highlighted one: the product in one icon |
+| 07e | **Bare** | No tile, just the highlight pill and a tall cursor. Sits next to the wordmark like a logotype |
 
 To adopt a direction, copy its SVG over `mark.svg` (and `apps/web/assets/mark.svg`), redraw `app-icon.svg` and `tray.svg` to match, then rerun `npm run icons` and `creatives/render.sh`.
 

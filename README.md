@@ -126,7 +126,6 @@ unblurt/
 │   │   └── src-tauri/    Rust: hotkey, clipboard, keystrokes, opencode process
 │   └── web/              Marketing site: static HTML/CSS/JS, no build step
 └── brand/                Logo, app icon, tray icon, illustrations, creatives
-    ├── explorations/     Five logo directions (see the sheet below)
     └── creatives/        Product shots, banner and social preview, rendered from HTML
 ```
 
@@ -148,8 +147,9 @@ unblurt/
 ## ✦ Brand
 
 <p align="center">
-  <img src="brand/explorations/sheet.png" alt="Five logo directions for unblurt" width="100%" /><br />
-  <img src="brand/explorations/sheet-2.png" alt="Five more logo directions" width="100%" />
+  <img src="brand/app-icon.svg" width="120" alt="unblurt app icon" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="brand/mark.svg" width="120" alt="unblurt mark" />
 </p>
 
 Petrol teal `#0F6B6A` · persimmon `#FF7A45` · warm stone `#EDE6DD` · ink `#101010` · set in **Inter**. The full kit is in [`brand/`](brand/README.md).

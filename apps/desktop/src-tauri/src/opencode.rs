@@ -132,11 +132,24 @@ impl Engine {
         for _ in 0..80 {
             tokio::time::sleep(Duration::from_millis(250)).await;
             if self.healthy(&base).await {
+                self.sweep_sessions(&base).await;
                 inner.base = Some(base.clone());
                 return Ok(base);
             }
         }
         Err("opencode started but never answered. Try running `opencode serve` in a terminal to see why.".into())
+    }
+
+    /// Deletes sessions left over from a previous run. Each rewrite deletes its own session,
+    /// but if the app quit or crashed mid-rewrite that text would otherwise stay on disk.
+    /// The workspace is unblurt's own folder, so every session here is ours.
+    async fn sweep_sessions(&self, base: &str) {
+        let Ok(list) = self.get_json(&format!("{base}/session")).await else { return };
+        let ours = list.as_array().into_iter().flatten().filter(|s| s["title"] == "unblurt");
+        for id in ours.filter_map(|s| s["id"].as_str()) {
+            let _ = self.http.post(format!("{base}/session/{id}/abort")).send().await;
+            let _ = self.http.delete(format!("{base}/session/{id}")).send().await;
+        }
     }
 
     pub async fn restart(&self) -> Status {

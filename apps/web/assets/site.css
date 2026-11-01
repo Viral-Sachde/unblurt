@@ -387,3 +387,16 @@ section { scroll-margin-top: 72px; }
   .nav .btn.small { padding: 8px 12px; font-size: 13px; }
   .logo { font-size: 19px; }
 }
+
+/* ---------- tap targets (QA: 40px minimum on touch) ---------- */
+
+.nav-links a:not(.btn) { padding: 10px 2px; }
+.nav-links .gh-link { min-width: 40px; min-height: 40px; justify-content: center; }
+.nav .btn.small { min-height: 40px; }
+.demo-tabs button { min-height: 40px; padding-inline: 16px; }
+.logo { min-height: 40px; }
+.hero-shot picture { display: block; }
+.footer nav a, .footer span a { display: inline-flex; align-items: center; min-height: 40px; }
+.code button { min-height: 36px; min-width: 52px; padding: 6px 12px; }
+.bubble small { font-size: 12px; }
+.nav-links a:not(.btn) { min-width: 40px; justify-content: center; text-align: center; }

@@ -1,6 +1,8 @@
 (() => {
   const ua = navigator.userAgent;
-  const os = /Mac/.test(ua) ? "mac" : /Win/.test(ua) ? "windows" : /Linux|X11/.test(ua) ? "linux" : null;
+  // Phones and tablets can't run the desktop app. iPadOS reports itself as a Mac, so check touch too.
+  const mobile = /iPhone|iPad|iPod|Android/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 0);
+  const os = mobile ? null : /Mac/.test(ua) ? "mac" : /Win/.test(ua) ? "windows" : /Linux|X11/.test(ua) ? "linux" : null;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const OS_NAMES = { mac: "Mac", windows: "Windows", linux: "Linux" };
 

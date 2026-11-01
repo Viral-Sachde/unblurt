@@ -11,6 +11,11 @@ body{width:100vw;height:100vh;overflow:hidden;font-family:Inter,sans-serif;color
 .stage{position:absolute;left:50%;top:50%;width:1200px;height:720px;transform:translate(-50%,-50%)}
 .doc h2{font-size:26px;font-weight:600;letter-spacing:-.03em}
 .doc p{color:#2b2925;font-size:17px;line-height:1.6}
+/* tall layout for phones: product.html?tall#message */
+body.tall .stage{width:640px;height:800px}
+body.tall .win{left:24px;top:24px;width:592px;height:410px}
+body.tall .pop{left:36px;right:auto;top:452px;width:568px}
+body.tall .keys{left:var(--kx,360px);top:var(--ky,400px)}
 .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(16,16,16,.12) 1.6px,transparent 1.8px);background-size:26px 26px}
 
 /* host app window */
@@ -116,11 +121,12 @@ const S = {
   },
 };
 const s = S[location.hash.slice(1)] || S.message;
-if (s.keys) { document.body.style.setProperty("--kx", s.keys[0]); document.body.style.setProperty("--ky", s.keys[1]); }
+if (s.keys && !location.search.includes("tall")) { document.body.style.setProperty("--kx", s.keys[0]); document.body.style.setProperty("--ky", s.keys[1]); }
 win.innerHTML = s.win;
 if (s.tone) tone.textContent = s.tone; else tone.remove();
 out.textContent = s.out;
 const params = new URLSearchParams(location.search);
+if (params.has("tall")) document.body.classList.add("tall");
 if (params.get("logo")) logo.src = params.get("logo");
 modes.innerHTML = ["Rephrase","Email","Message","Reply","Shorter","Fix","Ask"].map(m => `<span class="${m===s.mode?"on":""}">${m}</span>`).join("");
 </script>

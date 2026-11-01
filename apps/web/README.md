@@ -25,12 +25,10 @@ npx serve apps/web     # or just open index.html in a browser
 
 ## Deploy
 
-The folder is linked to the Vercel project `unblurt`. Deploy from inside it:
+The Vercel project `unblurt` is connected to this GitHub repo with its root directory set to `apps/web`:
 
-```bash
-cd apps/web
-vercel deploy --prod
-```
+- **Push to `main`** to deploy to production at unblurt.vercel.app.
+- **Push any other branch** to get a preview URL.
 
 `.vercel/` and `.env.local` are created by `vercel link`. They're git-ignored, so don't commit them.
 

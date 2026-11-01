@@ -148,7 +148,8 @@ unblurt/
 ## ✦ Brand
 
 <p align="center">
-  <img src="brand/explorations/sheet.png" alt="Five logo directions for unblurt" width="100%" />
+  <img src="brand/explorations/sheet.png" alt="Five logo directions for unblurt" width="100%" /><br />
+  <img src="brand/explorations/sheet-2.png" alt="Five more logo directions" width="100%" />
 </p>
 
 Petrol teal `#0F6B6A` · persimmon `#FF7A45` · warm stone `#EDE6DD` · ink `#101010` · set in **Inter**. The full kit is in [`brand/`](brand/README.md).

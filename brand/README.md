@@ -29,10 +29,12 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 | [`app-icon.svg`](app-icon.svg) | 1024px app icon. Run `npm run icons` in `apps/desktop` to rebuild every platform size |
 | [`tray.svg`](tray.svg) | Single-colour template icon for the macOS menu bar and the system tray |
 | [`illustrations.mjs`](illustrations.mjs) | Generates the isometric keycap illustration: `node brand/illustrations.mjs apps/web/assets` |
-| [`explorations/`](explorations) | Five logo directions and the comparison sheet |
+| [`explorations/`](explorations) | Ten logo directions across two comparison sheets |
 | [`creatives/`](creatives) | Product shots, README banner and social preview image |
 
 ## Logo explorations
+
+### Round one
 
 <img src="explorations/sheet.png" alt="Five logo directions" width="100%" />
 
@@ -43,6 +45,18 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 | 03 | **Dissolve** | A lowercase *u* whose left stem breaks up into dots (blurred) while the right stays solid (clear). The orange dot is the full stop |
 | 04 | **u-bubble** | A speech bubble with a lowercase *u* cut out of it and an orange cursor dot. The strongest at dock and tray sizes |
 | 05 | **Lens** | Wavy lines outside a lens and straight lines inside it. The most literal take on *unblur* |
+
+### Round two
+
+<img src="explorations/sheet-2.png" alt="Five more logo directions" width="100%" />
+
+| # | Direction | Idea |
+|---|---|---|
+| 06 | **u.** | A lowercase u and a full stop: messy in, finished sentence out |
+| 07 | **Caret** | A highlighted line and a text cursor, because selecting text is step one |
+| 08 | **Focus** | Camera focus brackets locking onto one clear dot |
+| 09 | **Keycap** | The product is one shortcut, so the icon is a key with a u on it |
+| 10 | **Afterimage** | A blurted thought's motion trail settling into one sharp dot above a clean line |
 
 To adopt a direction, copy its SVG over `mark.svg` (and `apps/web/assets/mark.svg`), redraw `app-icon.svg` and `tray.svg` to match, then rerun `npm run icons` and `creatives/render.sh`.
 

@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,sans-serif;background:#F6F2EC;color:#101010;width:1600px;padding:64px}
+header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
+h1{font-size:64px;font-weight:500;letter-spacing:-.04em;line-height:.95}
+.label{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#57534d}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+.card{display:flex;flex-direction:column;background:#fff;border-radius:20px;overflow:hidden;border:1px solid rgba(16,16,16,.08)}
+.hero{background:#EDE6DD;height:280px;display:grid;place-items:center}
+.hero img{width:180px;height:180px}
+.meta{padding:18px 20px 8px}
+.meta b{font-size:12px;letter-spacing:.08em;color:#FF7A45}
+.meta h2{font-size:24px;font-weight:600;letter-spacing:-.03em;margin:4px 0 6px}
+.meta p{font-size:14px;line-height:1.4;color:#57534d;min-height:60px}
+.sizes{display:flex;align-items:flex-end;gap:14px;padding:12px 20px}
+.dark{margin-top:auto;background:#101010;display:flex;align-items:center;gap:14px;padding:20px}
+.lock{display:flex;align-items:center;gap:10px;padding:20px;border-top:1px solid rgba(16,16,16,.08)}
+.lock span{font-size:30px;font-weight:600;letter-spacing:-.045em}
+.dark span{color:#FBF8F4;font-size:24px;font-weight:600;letter-spacing:-.045em}
+</style></head><body>
+<header><h1>unblurt<br>logo explorations</h1><span class="label">round two · five directions</span></header>
+<div class="grid" id="g"></div>
+<script>
+const C=[["06","u.","The u and a full stop. Messy in, finished sentence out. Reads as a name, works as a period on every icon size."],
+["07","Caret","A highlighted line with a text cursor. The first thing you do with unblurt is select text, so the icon is the selection."],
+["08","Focus","Camera focus brackets locking onto one clear dot. Unblur, literally, without any blur effects that turn to mush at 16px."],
+["09","Keycap","The product is one shortcut, so the icon is a key. Orange keycap with a u, looks pressable in the dock."],
+["10","Afterimage","A thought blurted out fast, its motion trail settling into one sharp dot above a clean line of text."]];
+const files=["06-u-period","07-caret","08-focus","09-keycap","10-ghost"];
+g.innerHTML=C.map(([n,t,d],i)=>{const f=files[i]+".svg";return `<div class="card"><div class="hero"><img src="${f}"></div>
+<div class="meta"><b>${n}</b><h2>${t}</h2><p>${d}</p></div>
+<div class="sizes">${[64,40,24,16].map(s=>`<img src="${f}" width="${s}" height="${s}">`).join("")}</div>
+<div class="lock"><img src="${f}" width="40" height="40"><span>unblurt</span></div>
+<div class="dark"><img src="${f}" width="36" height="36"><span>unblurt</span></div></div>`}).join("");
+</script></body></html>

@@ -23,32 +23,30 @@
       <nav class="nav-links">
         <a href="#how">How it works</a>
         <a href="#modes">Modes</a>
+        <a href="#story">Story</a>
         <a href="#engine">Privacy</a>
+        <a class="gh-link" href="https://github.com/Viral-Sachde/unblurt" target="_blank" rel="noopener" aria-label="unblurt on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
         <a class="btn primary small" href="download.html" data-os-cta>Download</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- Poster hero -->
-    <section class="poster wrap">
-      <div class="poster-top reveal">
+    <!-- Hero: fits the first screen -->
+    <section class="hero wrap">
+      <div class="hero-copy reveal">
+        <span class="eyebrow"><i></i>v0.1 · free beta · open source</span>
         <h1 class="display">your brain,<br />unfiltered.</h1>
-        <span class="label">Note No. 0001</span>
-      </div>
-      <figure class="panel reveal">
-        <img src="assets/product-message.png" alt="A messy Slack draft is selected, and the unblurt popover in Message mode shows it rewritten as a clear reply, ready to paste." />
-      </figure>
-      <div class="poster-bottom">
-        <div class="hero-cta reveal">
-          <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly: rephrased, drafted, replied to.</p>
-          <div class="row">
-            <a class="btn primary" href="download.html" data-os-cta>Download</a>
-            <a class="btn ghost" href="#how">See it work</a>
-          </div>
+        <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly: rephrased, drafted, replied to.</p>
+        <div class="row">
+          <a class="btn primary" href="download.html" data-os-cta>Download</a>
+          <a class="btn ghost" href="https://github.com/Viral-Sachde/unblurt" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 01.67.42l1.88 3.8 4.2.61a.75.75 0 01.41 1.28l-3.04 2.96.72 4.18a.75.75 0 01-1.09.79L8 12.33l-3.75 1.97a.75.75 0 01-1.09-.79l.72-4.18L.84 6.37a.75.75 0 01.41-1.28l4.2-.61L7.33.67A.75.75 0 018 .25z"/></svg>Star on GitHub</a>
         </div>
-        <p class="display reveal">your words,<br />sorted.</p>
+        <p class="hero-hint">works in any app · <kbd data-mod>⌘</kbd> <kbd>⇧</kbd> <kbd>Space</kbd></p>
       </div>
+      <figure class="hero-shot reveal">
+        <img src="assets/product-message.png" width="2400" height="1440" fetchpriority="high" alt="A messy Slack draft is selected, and the unblurt popover in Message mode shows it rewritten as a clear reply, ready to paste." />
+      </figure>
     </section>
 
     <hr class="rule" />
@@ -64,7 +62,7 @@
     <section class="section wrap" id="how" style="padding-top: 0">
       <div class="section-head reveal">
         <h2 class="h2">Three keys.<br />Zero tabs.</h2>
-        <span class="label">Note No. 0002</span>
+        <span class="label">How it works</span>
       </div>
       <div class="demo reveal" id="demo">
         <div class="demo-tabs" role="tablist" aria-label="Examples">
@@ -101,6 +99,23 @@
       </div>
     </section>
 
+    <!-- Story -->
+    <section class="section wrap story" id="story">
+      <div class="story-head reveal">
+        <span class="eyebrow"><i></i>Why this exists</span>
+        <h2 class="h2">copy, paste,<br />prompt, copy,<br />paste.</h2>
+      </div>
+      <div class="story-body reveal">
+        <p>I kept doing the same little dance. Type something messy in Slack, copy it, open ChatGPT, write "make this sound normal", copy the answer, switch back, paste. Ten times a day, for messages that took thirty seconds to think of.</p>
+        <p>Voice tools like Wispr Flow fixed this for speaking. I wanted the same thing for typing: no new tab, no prompt to write, no account to make. Select, press a shortcut, get it back sorted.</p>
+        <p>So I built unblurt. It runs on the model you already use, on your own machine, and gets out of the way. It's open source and still early, so if something feels off, tell me on GitHub.</p>
+        <a class="byline" href="https://github.com/Viral-Sachde" target="_blank" rel="noopener">
+          <img src="https://github.com/Viral-Sachde.png?size=96" alt="" width="44" height="44" loading="lazy" />
+          <span><b>Viral Sachde</b><small>made unblurt · @Viral-Sachde</small></span>
+        </a>
+      </div>
+    </section>
+
     <!-- Showreel -->
     <section class="reel" aria-label="Showreel">
       <div class="wrap section-head">
@@ -109,27 +124,27 @@
       </div>
       <div class="reel-stage" id="reel" tabindex="0" aria-roledescription="carousel">
         <article class="reel-card">
-          <div class="top"><h3>speak your mind.</h3><span class="no">Note No.<br />0003</span></div>
+          <div class="top"><h3>speak your mind.</h3><span class="no">Mode<br />Rephrase</span></div>
           <div class="art"><img src="assets/product-rephrase.png" alt="Rephrase mode turning a rambling sentence in a doc into a clear one" loading="lazy" /></div>
           <p class="bottom">messy<br />is fine.</p>
         </article>
         <article class="reel-card">
-          <div class="top"><h3>fix the chaos.</h3><span class="no">Note No.<br />0004</span></div>
+          <div class="top"><h3>fix the chaos.</h3><span class="no">Mode<br />Fix</span></div>
           <div class="art"><img src="assets/product-fix.png" alt="Fix mode correcting spelling and grammar in release notes" loading="lazy" /></div>
           <p class="bottom">we'll sort<br />it out.</p>
         </article>
         <article class="reel-card">
-          <div class="top"><h3>send something brilliant.</h3><span class="no">Note No.<br />0005</span></div>
+          <div class="top"><h3>send something brilliant.</h3><span class="no">Mode<br />Reply</span></div>
           <div class="art"><img src="assets/product-reply.png" alt="Reply mode drafting a warm answer to a message from Alex" loading="lazy" /></div>
           <p class="bottom">every<br />time.</p>
         </article>
         <article class="reel-card">
-          <div class="top"><h3>one shortcut.</h3><span class="no">Note No.<br />0006</span></div>
+          <div class="top"><h3>one shortcut.</h3><span class="no">The<br />shortcut</span></div>
           <div class="art"><img src="assets/keys.svg" alt="" /></div>
           <p class="bottom">anywhere<br />you type.</p>
         </article>
         <article class="reel-card">
-          <div class="top"><h3>messy thoughts.</h3><span class="no">Note No.<br />0007</span></div>
+          <div class="top"><h3>messy thoughts.</h3><span class="no">Mode<br />Email</span></div>
           <div class="art"><img src="assets/product-email.png" alt="Email mode turning a few rough notes into a polite overdue-invoice email" loading="lazy" /></div>
           <p class="bottom">clear<br />writing.</p>
         </article>
@@ -149,7 +164,7 @@
     <section class="section wrap" id="modes">
       <div class="section-head reveal">
         <h2 class="h2">Seven small jobs<br />you used to open<br />a chatbot for.</h2>
-        <span class="label">Note No. 0008</span>
+        <span class="label">⌘1 to ⌘7</span>
       </div>
       <div class="modes-grid reveal">
         <article class="mode">
@@ -243,7 +258,7 @@
     <section class="poster wrap">
       <div class="poster-top reveal">
         <h2 class="display">stop editing<br />yourself</h2>
-        <span class="label">Note No. 0009</span>
+        <span class="label">Free while in beta</span>
       </div>
       <div class="poster-bottom">
         <div class="hero-cta reveal">
@@ -262,8 +277,9 @@
         <a href="#how">How it works</a>
         <a href="download.html">Download</a>
         <a href="download.html#faq">FAQ</a>
+        <a href="https://github.com/Viral-Sachde/unblurt" target="_blank" rel="noopener">GitHub</a>
       </nav>
-      <span>messy thoughts. clear writing.</span>
+      <span>made by <a href="https://github.com/Viral-Sachde" target="_blank" rel="noopener">Viral Sachde</a> · messy thoughts. clear writing.</span>
     </div>
   </footer>
 

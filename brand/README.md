@@ -25,8 +25,9 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 
 | File | What it is |
 |---|---|
-| [`mark.svg`](mark.svg) | Current logo mark: a speech bubble with a bite and the orange dot |
-| [`app-icon.svg`](app-icon.svg) | 1024px app icon. Run `npm run icons` in `apps/desktop` to rebuild every platform size |
+| [`logo.mjs`](logo.mjs) | Source of truth for the logo. `node brand/logo.mjs` writes every file below plus the desktop `Mark.tsx` |
+| [`mark.svg`](mark.svg) | The logo: a highlighted selection and a text cursor (Caret, polished) |
+| [`app-icon.svg`](app-icon.svg) | 1024px app icon: the Caret on a teal tile. Run `npm run icons` in `apps/desktop` to rebuild every platform size |
 | [`tray.svg`](tray.svg) | Single-colour template icon for the macOS menu bar and the system tray |
 | [`illustrations.mjs`](illustrations.mjs) | Generates the isometric keycap illustration: `node brand/illustrations.mjs apps/web/assets` |
 | [`explorations/`](explorations) | Ten logo directions plus five Caret iterations, with comparison sheets |
@@ -70,7 +71,9 @@ Supporting tints: teal tint `#E3EFEE` (result box), persimmon tint `#FFD7C4` (se
 | 07d | **Before / after** | A wavy messy line above a clean highlighted one: the product in one icon |
 | 07e | **Bare** | No tile, just the highlight pill and a tall cursor. Sits next to the wordmark like a logotype |
 
-To adopt a direction, copy its SVG over `mark.svg` (and `apps/web/assets/mark.svg`), redraw `app-icon.svg` and `tray.svg` to match, then rerun `npm run icons` and `creatives/render.sh`.
+**Chosen:** the Caret direction (07), polished: straight rounded I-beam, highlight centred on it. App icon uses the teal tile (07b), everything else the bare mark (07e).
+
+To change it again, copy its SVG over `mark.svg` (and `apps/web/assets/mark.svg`), redraw `app-icon.svg` and `tray.svg` to match, then rerun `npm run icons` and `creatives/render.sh`.
 
 ## Creatives
 

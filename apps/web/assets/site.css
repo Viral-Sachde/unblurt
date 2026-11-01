@@ -367,11 +367,9 @@ section { scroll-margin-top: 72px; }
 .story-head { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; position: sticky; top: 96px; }
 .story-body p { margin: 0 0 1.1em; font-size: clamp(18px, 1.7vw, 21px); line-height: 1.6; letter-spacing: -0.012em; color: #2b2925; max-width: 56ch; }
 .story-body p:first-child::first-letter { color: var(--teal); }
-.byline { display: inline-flex; align-items: center; gap: 12px; margin-top: 10px; text-decoration: none; padding: 8px 16px 8px 8px; border-radius: 999px; background: var(--stone-soft); border: 1px solid var(--line); transition: background 0.15s; }
-.byline:hover { background: var(--stone); }
-.byline img { width: 44px; height: 44px; border-radius: 50%; background: var(--stone); }
-.byline b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.015em; }
-.byline small { display: block; font-size: 13px; color: var(--ink-soft); }
+.byline { margin: 18px 0 0 !important; display: flex; flex-direction: column; gap: 2px; }
+.byline b { font-size: 16px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+.byline small { font-size: 14px; color: var(--ink-soft); }
 @media (max-width: 860px) { .story { grid-template-columns: minmax(0, 1fr); } .story-head { position: static; } }
 
 /* ---------- mobile polish ---------- */

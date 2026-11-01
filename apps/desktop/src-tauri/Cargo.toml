@@ -1,0 +1,23 @@
+[package]
+name = "unblurt"
+version = "0.1.0"
+description = "messy thoughts. clear writing."
+edition = "2021"
+
+[lib]
+name = "unblurt_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "macos-private-api", "image-png"] }
+tauri-plugin-global-shortcut = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Only ever talks to the local opencode server, so no TLS stack is needed.
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+tokio = { version = "1", features = ["process", "time", "sync", "macros"] }
+arboard = "3"
+enigo = "0.6"

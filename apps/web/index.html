@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>unblurt — messy thoughts. clear writing.</title>
+  <meta name="description" content="Select text anywhere, press one shortcut, get it back written properly. Rephrase, draft emails and messages, reply — without opening a chat tab." />
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="index.html"><img src="assets/mark.svg" alt="" />unblurt</a>
+      <nav class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#modes">Modes</a>
+        <a href="#engine">Privacy</a>
+        <a class="btn primary small" href="download.html" data-os-cta>Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Poster hero -->
+    <section class="poster wrap">
+      <div class="poster-top reveal">
+        <h1 class="display">your brain,<br />unfiltered.</h1>
+        <span class="label">Note No. 0001</span>
+      </div>
+      <figure class="panel lane reveal">
+        <img src="assets/lane.svg" alt="A tangled orange ball of thought rolls down a teal lane and comes out the other end as a neat stack of written cards." />
+      </figure>
+      <div class="poster-bottom">
+        <div class="hero-cta reveal">
+          <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly — rephrased, drafted, replied to.</p>
+          <div class="row">
+            <a class="btn primary" href="download.html" data-os-cta>Download</a>
+            <a class="btn ghost" href="#how">See it work</a>
+          </div>
+        </div>
+        <p class="display reveal">your words,<br />sorted.</p>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <section class="section wrap">
+      <p class="statement reveal">
+        <em>Not dictation. Not another chat tab.</em>
+        A tiny window for every small writing job you used to <mark>copy, paste, prompt, copy, paste</mark> for.
+      </p>
+    </section>
+
+    <!-- Live demo -->
+    <section class="section wrap" id="how" style="padding-top: 0">
+      <div class="section-head reveal">
+        <h2 class="h2">Three keys.<br />Zero tabs.</h2>
+        <span class="label">Note No. 0002</span>
+      </div>
+      <div class="demo reveal" id="demo">
+        <div class="demo-tabs" role="tablist" aria-label="Examples">
+          <button role="tab" aria-selected="true" data-scene="0">A message</button>
+          <button role="tab" aria-selected="false" data-scene="1">An email</button>
+          <button role="tab" aria-selected="false" data-scene="2">A reply</button>
+        </div>
+        <div class="fake-app" aria-live="off">
+          <div class="fake-bar"><i></i><i></i><i></i><span data-demo="where">#launch-crew</span></div>
+          <div class="fake-thread" data-demo="thread"></div>
+          <div class="composer" data-demo="composer"></div>
+
+          <div class="keys-overlay" data-demo="keys"><kbd data-mod>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></div>
+
+          <div class="pop" data-demo="pop" aria-hidden="true">
+            <div class="pop-bar">
+              <span class="brand"><img src="assets/mark.svg" alt="" />unblurt</span>
+              <span class="pop-tone" data-demo="tone">casual</span>
+            </div>
+            <div class="pop-modes" data-demo="modes">
+              <span>Rephrase</span><span>Email</span><span>Message</span><span>Reply</span><span>Shorter</span><span>Fix</span><span>Ask</span>
+            </div>
+            <div class="is-compose pop-input" data-demo="input"></div>
+            <div class="is-compose pop-note" data-demo="note"></div>
+            <div class="pop-working">untangling…</div>
+            <div class="is-result pop-sorted">sorted.</div>
+            <div class="is-result pop-output" data-demo="output"></div>
+            <div class="pop-foot">
+              <span><span data-mod>⌘</span>1–7 mode · <span data-mod>⌘</span>T tone</span>
+              <span class="act"><b class="ghost is-result">copy</b><b data-demo="go">unblurt ↵</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showreel -->
+    <section class="reel" aria-label="Showreel">
+      <div class="wrap section-head">
+        <h2 class="h2">speak your mind.<br />fix the chaos.<br />send something brilliant.</h2>
+        <span class="label">Showreel</span>
+      </div>
+      <div class="reel-stage" id="reel" tabindex="0" aria-roledescription="carousel">
+        <article class="reel-card">
+          <div class="top"><h3>speak your mind.</h3><span class="no">Note No.<br />0003</span></div>
+          <div class="art">
+            <svg viewBox="0 0 500 350" aria-hidden="true">
+              <rect width="500" height="350" fill="#EDE6DD" />
+              <rect x="70" y="70" width="250" height="190" rx="62" fill="#0F6B6A" />
+              <path d="M112 226 Q108 290 84 318 Q142 302 184 252 Z" fill="#0F6B6A" />
+              <path d="M140 168 C 160 110, 250 118, 240 170 S 158 214, 182 160 S 292 116, 304 176 S 364 236, 430 150" fill="none" stroke="#FF7A45" stroke-width="13" stroke-linecap="round" />
+              <path d="M372 86 l14 -28 M404 104 l24 -22" stroke="#101010" stroke-width="8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <p class="bottom">messy<br />is fine.</p>
+        </article>
+        <article class="reel-card">
+          <div class="top"><h3>fix the chaos.</h3><span class="no">Note No.<br />0004</span></div>
+          <div class="art">
+            <svg viewBox="0 0 500 350" aria-hidden="true">
+              <rect width="500" height="350" fill="#EDE6DD" />
+              <path d="M40 180 C 60 90, 160 100, 140 170 S 50 250, 92 182 S 190 110, 196 196 S 110 268, 80 222 S 170 150, 226 175" fill="none" stroke="#FF7A45" stroke-width="10" stroke-linecap="round" />
+              <g fill="#0F6B6A">
+                <rect x="252" y="62" width="36" height="226" rx="12" />
+                <rect x="226" y="82" width="34" height="9" rx="4.5" /><rect x="226" y="112" width="34" height="9" rx="4.5" />
+                <rect x="226" y="142" width="34" height="9" rx="4.5" /><rect x="226" y="172" width="34" height="9" rx="4.5" />
+                <rect x="226" y="202" width="34" height="9" rx="4.5" /><rect x="226" y="232" width="34" height="9" rx="4.5" />
+                <rect x="226" y="262" width="34" height="9" rx="4.5" />
+              </g>
+              <g stroke="#FF7A45" stroke-width="10" stroke-linecap="round">
+                <path d="M312 102 H 460" /><path d="M312 142 H 440" /><path d="M312 182 H 462" /><path d="M312 222 H 420" /><path d="M312 262 H 448" />
+              </g>
+            </svg>
+          </div>
+          <p class="bottom">we'll sort<br />it out.</p>
+        </article>
+        <article class="reel-card">
+          <div class="top"><h3>send something brilliant.</h3><span class="no">Note No.<br />0005</span></div>
+          <div class="art">
+            <svg viewBox="0 0 500 350" aria-hidden="true">
+              <rect width="500" height="350" fill="#EDE6DD" />
+              <circle cx="410" cy="84" r="42" fill="#FF7A45" />
+              <path d="M40 300 C 100 320, 180 230, 130 214 S 84 286, 196 250" fill="none" stroke="#0F6B6A" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 18" />
+              <g transform="translate(196 92)">
+                <path d="M0 120 L 236 0 L 128 186 Z" fill="#FFFFFF" />
+                <path d="M86 136 L 236 0 L 102 190 Z" fill="#DDD3C6" />
+                <path d="M86 136 L 102 190 L 126 160 Z" fill="#C7BBAB" />
+              </g>
+            </svg>
+          </div>
+          <p class="bottom">every<br />time.</p>
+        </article>
+        <article class="reel-card">
+          <div class="top"><h3>one shortcut.</h3><span class="no">Note No.<br />0006</span></div>
+          <div class="art"><img src="assets/keys.svg" alt="" /></div>
+          <p class="bottom">anywhere<br />you type.</p>
+        </article>
+        <article class="reel-card">
+          <div class="top"><h3>messy thoughts.</h3><span class="no">Note No.<br />0007</span></div>
+          <div class="art"><img src="assets/lane.svg" alt="" /></div>
+          <p class="bottom">clear<br />writing.</p>
+        </article>
+      </div>
+      <div class="reel-nav">
+        <button data-reel="prev" aria-label="Previous">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6" /></svg>
+        </button>
+        <div class="reel-dots" id="reel-dots"></div>
+        <button data-reel="next" aria-label="Next">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" /></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Modes -->
+    <section class="section wrap" id="modes">
+      <div class="section-head reveal">
+        <h2 class="h2">Seven small jobs<br />you used to open<br />a chatbot for.</h2>
+        <span class="label">Note No. 0008</span>
+      </div>
+      <div class="modes-grid reveal">
+        <article class="mode">
+          <div class="mode-head"><h3>Rephrase</h3><kbd><span data-mod>⌘</span>1</kbd></div>
+          <p class="before">so basically what im trying to say is the timeline doesnt really work</p>
+          <p class="after">The timeline doesn't work for us as it stands.</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Email</h3><kbd><span data-mod>⌘</span>2</kbd></div>
+          <p class="before">invoice late again, chase them, nicely but firm</p>
+          <p class="after">Subject: Invoice #2041 — now 14 days overdue …</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Message</h3><kbd><span data-mod>⌘</span>3</kbd></div>
+          <p class="before">running late 10 min start without me pls</p>
+          <p class="after">Running about 10 minutes late — go ahead and start without me.</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Reply</h3><kbd><span data-mod>⌘</span>4</kbd></div>
+          <p class="before">+ politely no, maybe next quarter</p>
+          <p class="after">Thanks for thinking of me. I can't take this on right now, but I'd love to revisit next quarter.</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Shorter</h3><kbd><span data-mod>⌘</span>5</kbd></div>
+          <p class="before">That four-paragraph update nobody will read past line two.</p>
+          <p class="after">Same update. Three lines. Every point kept.</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Fix</h3><kbd><span data-mod>⌘</span>6</kbd></div>
+          <p class="before">their going to recieve it tomorow</p>
+          <p class="after">They're going to receive it tomorrow.</p>
+        </article>
+        <article class="mode">
+          <div class="mode-head"><h3>Ask</h3><kbd><span data-mod>⌘</span>7</kbd></div>
+          <p class="before">+ turn this into a checklist</p>
+          <p class="after">Anything else you'd have typed into a chat box.</p>
+        </article>
+        <article class="mode wide">
+          <p>Five tones on top: casual, neutral, warm, direct, formal.</p>
+          <span><kbd><span data-mod>⌘</span>T</kbd> to cycle</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Steps -->
+    <section class="section wrap" style="padding-top: 0">
+      <div class="steps">
+        <div class="step reveal">
+          <div class="art-mini"><img src="assets/mark.svg" alt="" width="64" height="64" /></div>
+          <span class="num">01</span>
+          <h3>Select.</h3>
+          <p>Highlight text in any app — mail, chat, docs, a browser field. Or select nothing and just start typing.</p>
+        </div>
+        <div class="step reveal">
+          <div class="art-mini"><span style="display: flex; gap: 6px"><kbd data-mod>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></span></div>
+          <span class="num">02</span>
+          <h3>Press.</h3>
+          <p>A small window pops up right where you're looking. Pick a mode, add a note if you want.</p>
+        </div>
+        <div class="step reveal">
+          <div class="art-mini"><span style="display: flex; gap: 6px"><kbd>↵</kbd></span></div>
+          <span class="num">03</span>
+          <h3>Enter.</h3>
+          <p>Enter once to write it. Enter again to paste it back where it came from. Done.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- Engine / privacy -->
+    <section class="section wrap" id="engine">
+      <div class="engine">
+        <div class="reveal">
+          <h2 class="h2">Your model.<br />Your machine.</h2>
+          <p class="lede" style="margin-top: 22px">
+            unblurt runs on <a href="https://opencode.ai" target="_blank" rel="noopener">opencode</a>, the open-source AI engine.
+            Plug in whichever model you already pay for — or one running on your laptop.
+          </p>
+        </div>
+        <ul class="reveal">
+          <li><div><b>Bring any model.</b><span>Anthropic, OpenAI, Google, OpenRouter, local models — anything opencode can connect to.</span></div></li>
+          <li><div><b>No account with us.</b><span>unblurt talks to a private engine on 127.0.0.1. There is no unblurt server.</span></div></li>
+          <li><div><b>Nothing kept.</b><span>Every rewrite uses a throwaway session that's deleted the moment you get your text.</span></div></li>
+          <li><div><b>Native and tiny.</b><span>Built with Tauri. Lives in your menu bar or tray on macOS, Windows and Linux.</span></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Closing poster -->
+    <section class="poster wrap">
+      <div class="poster-top reveal">
+        <h2 class="display">stop editing<br />yourself</h2>
+        <span class="label">Note No. 0009</span>
+      </div>
+      <div class="poster-bottom">
+        <div class="hero-cta reveal">
+          <p class="lede">Free while in beta. macOS, Windows and Linux.</p>
+          <div class="row"><a class="btn primary" href="download.html" data-os-cta>Download</a></div>
+        </div>
+        <p class="display reveal">mid-<br />sentence.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <a class="logo" href="index.html" style="font-size: 17px"><img src="assets/mark.svg" alt="" style="width: 22px; height: 22px" />unblurt</a>
+      <nav>
+        <a href="#how">How it works</a>
+        <a href="download.html">Download</a>
+        <a href="download.html#faq">FAQ</a>
+      </nav>
+      <span>messy thoughts. clear writing.</span>
+    </div>
+  </footer>
+
+  <script src="assets/site.js"></script>
+</body>
+</html>

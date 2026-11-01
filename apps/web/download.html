@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download unblurt</title>
+  <meta name="description" content="Get unblurt for macOS, Windows and Linux." />
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="index.html"><img src="assets/mark.svg" alt="" />unblurt</a>
+      <nav class="nav-links">
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#modes">Modes</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn primary small" href="download.html" aria-current="page">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="poster wrap">
+      <div class="poster-top reveal">
+        <h1 class="display">get it out.</h1>
+        <span class="label">Build 0.1.0<br />Beta</span>
+      </div>
+      <figure class="panel reveal">
+        <img src="assets/keys.svg" alt="Oversized keycaps: a teal command key, an orange shift key and a long white space bar." />
+      </figure>
+      <div class="poster-bottom">
+        <div class="hero-cta reveal">
+          <p class="lede">One app, every desktop. Free while in beta.</p>
+        </div>
+        <p class="display reveal">make it<br />clear.</p>
+      </div>
+    </section>
+
+    <!-- Release links: point these at your GitHub Releases (see README). -->
+    <section class="section wrap" style="padding-top: 0">
+      <div class="platforms">
+        <article class="platform reveal" data-os="mac">
+          <h3>macOS</h3>
+          <p>macOS 11 or later. Lives in the menu bar. Asks for Accessibility once so it can copy and paste for you.</p>
+          <div class="files">
+            <a href="#releases">Apple silicon <span>.dmg</span></a>
+            <a href="#releases">Intel <span>.dmg</span></a>
+          </div>
+        </article>
+        <article class="platform reveal" data-os="windows">
+          <h3>Windows</h3>
+          <p>Windows 10 and 11. Lives in the system tray. No admin rights needed for the per-user installer.</p>
+          <div class="files">
+            <a href="#releases">Installer <span>.exe</span></a>
+            <a href="#releases">MSI package <span>.msi</span></a>
+          </div>
+        </article>
+        <article class="platform reveal" data-os="linux">
+          <h3>Linux</h3>
+          <p>X11 desktops. On Wayland the popover works, but auto copy/paste may need a manual paste.</p>
+          <div class="files">
+            <a href="#releases">AppImage <span>.AppImage</span></a>
+            <a href="#releases">Debian / Ubuntu <span>.deb</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <h2 class="h2">Set up in<br />two minutes.</h2>
+        <span class="label">Note No. 0010</span>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="num">01</span>
+          <h3>Install opencode.</h3>
+          <p>The open-source engine unblurt runs on.</p>
+          <div class="code"><span>curl -fsSL https://opencode.ai/install | bash</span><button data-copy="curl -fsSL https://opencode.ai/install | bash">copy</button></div>
+          <div class="code"><span>npm i -g opencode-ai</span><button data-copy="npm i -g opencode-ai">copy</button></div>
+        </div>
+        <div class="step reveal">
+          <span class="num">02</span>
+          <h3>Connect a model.</h3>
+          <p>Sign in with the provider you already use, or point it at a local model.</p>
+          <div class="code"><span>opencode auth login</span><button data-copy="opencode auth login">copy</button></div>
+        </div>
+        <div class="step reveal">
+          <span class="num">03</span>
+          <h3>Open unblurt.</h3>
+          <p>It starts the engine by itself. Pick your model in settings, then press <kbd data-mod>⌘</kbd> <kbd>⇧</kbd> <kbd>Space</kbd> anywhere.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <section class="section wrap" id="faq">
+      <div class="section-head reveal">
+        <h2 class="h2">Questions.</h2>
+        <span class="label">Note No. 0011</span>
+      </div>
+      <div class="faq reveal">
+        <details open>
+          <summary>Is this speech-to-text?</summary>
+          <p>No. unblurt is text to text. You type (or select) the messy version; it hands back the version you'd actually send. Same one-shortcut ease, no microphone.</p>
+        </details>
+        <details>
+          <summary>Where does my text go?</summary>
+          <p>To the opencode engine on your own machine (127.0.0.1), and from there to whichever model provider you connected. There is no unblurt server, and each rewrite's session is deleted right after.</p>
+        </details>
+        <details>
+          <summary>Which models work?</summary>
+          <p>Anything opencode supports: Anthropic, OpenAI, Google, OpenRouter, GitHub Copilot, local models through Ollama or LM Studio, and more. Small fast models feel best — rewrites are short.</p>
+        </details>
+        <details>
+          <summary>Why does macOS ask for Accessibility access?</summary>
+          <p>To read your selection and paste the result, unblurt presses copy and paste for you. macOS requires Accessibility permission for that. Without it you can still type into the window and copy the result.</p>
+        </details>
+        <details>
+          <summary>Does it touch my clipboard?</summary>
+          <p>Briefly, to read your selection, then it puts back what was there. After a paste, the new text stays on your clipboard so you can paste it again.</p>
+        </details>
+        <details>
+          <summary>Can I change the shortcut?</summary>
+          <p>Yes. Open settings from the menu bar or tray icon, or press <kbd data-mod>⌘</kbd> <kbd>,</kbd> inside the window.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <a class="logo" href="index.html" style="font-size: 17px"><img src="assets/mark.svg" alt="" style="width: 22px; height: 22px" />unblurt</a>
+      <nav>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#modes">Modes</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <span>messy thoughts. clear writing.</span>
+    </div>
+  </footer>
+
+  <script src="assets/site.js"></script>
+</body>
+</html>

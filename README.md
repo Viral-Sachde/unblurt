@@ -1,17 +1,77 @@
-# unblurt
+<p align="center">
+  <img src="brand/creatives/banner.png" alt="unblurt: messy thoughts. clear writing." width="100%" />
+</p>
 
-**messy thoughts. clear writing.**
+<p align="center">
+  <b>Select text anywhere. Press one shortcut. Get it back written properly.</b><br />
+  A tiny desktop popover for every small writing job you used to open a chatbot for.
+</p>
 
-A Wispr Flow–style desktop utility, but text-to-text. Select text anywhere (or just start typing), press one shortcut, pick a mode, hit enter, and the cleaned-up text is pasted back where you were. It's for all the small writing jobs you'd otherwise copy into ChatGPT: rephrasing, drafting emails and messages, replying, shortening and fixing.
+<p align="center">
+  <a href="https://unblurt.vercel.app"><img alt="Website" src="https://img.shields.io/badge/site-unblurt.vercel.app-0F6B6A?style=flat-square" /></a>
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-FF7A45?style=flat-square" />
+  <img alt="Platforms" src="https://img.shields.io/badge/macOS%20·%20Windows%20·%20Linux-101010?style=flat-square" />
+  <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square&logo=tauri&logoColor=white" />
+  <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-000000?style=flat-square&logo=rust" />
+  <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black" />
+</p>
+
+<p align="center">
+  <a href="#-how-it-feels">How it feels</a> ·
+  <a href="#-modes">Modes</a> ·
+  <a href="#-under-the-hood">Under the hood</a> ·
+  <a href="#-quick-start">Quick start</a> ·
+  <a href="#-repo-map">Repo map</a> ·
+  <a href="#-brand">Brand</a>
+</p>
+
+---
+
+## ✦ How it feels
 
 ```
-unblurt/
-├── apps/desktop/   Tauri 2 + React app (macOS, Windows, Linux)
-├── apps/web/       Marketing site: index.html + download.html (static, no build step)
-└── brand/          Logo mark, app icon, tray icon, illustration generator
+  ┌──────────────────────────────────────────────────────────────┐
+  │  so basically what im trying to say is the timeline          │   ← you, in Slack, mid-thought
+  │  doesnt really work for us lol                               │
+  └──────────────────────────────────────────────────────────────┘
+                     ⌘ ⇧ Space   →   Rephrase   →   ↵
+  ┌──────────────────────────────────────────────────────────────┐
+  │  The timeline doesn't work for us as it stands.              │   ← pasted back, right where you were
+  └──────────────────────────────────────────────────────────────┘
 ```
 
-## How it works
+**Not dictation. Not another chat tab.** It's like Wispr Flow, but text in, text out. Highlight something (or start from nothing), hit the shortcut, pick a mode and a tone, press enter. The rewrite is pasted back into the app you were in, and your clipboard is put back the way it was.
+
+## ✦ Modes
+
+| Key | Mode | What it does | Before → after |
+|:---:|---|---|---|
+| `⌘1` | **Rephrase** | Same meaning, better words | *"so basically what im trying to say…"* → *"The timeline doesn't work for us as it stands."* |
+| `⌘2` | **Email** | Turns notes into a full email | *"invoice late again, chase them, nicely but firm"* → *"Subject: Invoice #2041, now 14 days overdue…"* |
+| `⌘3` | **Message** | Chat-length, human, sendable | *"running late 10 min start without me pls"* → *"Running about 10 minutes late, so go ahead and start without me."* |
+| `⌘4` | **Reply** | Answers the selected text with your gist | Select their message, add *"yes but next week"* |
+| `⌘5` | **Shorter** | Cuts it down, keeps the point | |
+| `⌘6` | **Fix** | Grammar and spelling only, keeps your voice | |
+| `⌘7` | **Ask** | Free-form instruction on the selection | *"make this a bulleted list"* |
+
+<table>
+  <tr>
+    <td width="50%"><img src="brand/creatives/product-rephrase.png" alt="Rephrase mode in a doc" /><br /><sub><b>Rephrase</b> · a rambling doc sentence, made clear</sub></td>
+    <td width="50%"><img src="brand/creatives/product-email.png" alt="Email mode drafting an invoice reminder" /><br /><sub><b>Email</b> · rough notes into a sendable email</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="brand/creatives/product-reply.png" alt="Reply mode answering a DM" /><br /><sub><b>Reply</b> · their message plus your gist</sub></td>
+    <td width="50%"><img src="brand/creatives/product-fix.png" alt="Fix mode correcting release notes" /><br /><sub><b>Fix</b> · spelling and grammar, your words kept</sub></td>
+  </tr>
+</table>
+
+**Tones** (`⌘T` to cycle): `casual` · `neutral` · `warm` · `direct` · `formal`
+
+**Popover keys:** `↵` run, then `↵` paste · `⌘C` copy · `⌘R` again · `⌘E` back to edit · `esc` close · `⌘,` settings
+
+> On Windows and Linux, `⌘` is `Ctrl`.
+
+## ✦ Under the hood
 
 ```
  any app ──⌘⇧Space──▶ Rust: copy selection (simulated ⌘C, clipboard restored)
@@ -26,48 +86,82 @@ unblurt/
                  result ──↵──▶ hide, return focus, simulated ⌘V into the original app
 ```
 
-- **Engine.** unblurt finds your `opencode` install (it asks your login shell, because GUI apps don't inherit PATH) and runs a private `opencode serve` with its own config in the app-data folder. That config defines a tool-less `unblurt` agent. Each rewrite gets a throwaway session that's deleted afterwards. If a provider is rate-limited or out of quota, opencode retries silently and the request would hang. unblurt watches `/session/status` and shows the reason instead.
-- **Models.** Anything you've connected with `opencode auth login`. You pick one in Settings; otherwise opencode's default is used.
-- **Modes:** Rephrase, Email, Message, Reply, Shorter, Fix, Ask (`⌘1`–`⌘7`). **Tones:** casual, neutral, warm, direct, formal (`⌘T`). Prompts live in `apps/desktop/src/lib/modes.ts`.
-- **Keys in the popover:** `↵` run, then `↵` paste · `⌘C` copy · `⌘R` again · `⌘E` back to edit · `esc` close · `⌘,` settings.
+- **Bring your own model.** unblurt runs on [opencode](https://opencode.ai), so it works with any provider you've connected using `opencode auth login`. Pick a model in Settings or use opencode's default.
+- **Local and disposable.** unblurt starts a private `opencode serve` on `127.0.0.1` with its own config in the app-data folder. Each rewrite gets a throwaway session that's deleted afterwards.
+- **No tools, just writing.** The `unblurt` agent can't run commands, read files or browse. It rewrites text and nothing else.
+- **Honest failures.** When a provider is rate-limited or out of quota, opencode retries silently. unblurt watches `/session/status` and tells you why instead of spinning forever.
+- **Finds opencode on its own.** It asks your login shell for the path, because GUI apps don't inherit `PATH`. Set `UNBLURT_OPENCODE=/path/to/opencode` to override.
 
-## Run it
+## ✦ Quick start
 
-Prerequisites: Node 18+, [Rust](https://rustup.rs) (stable), the [Tauri system deps](https://v2.tauri.app/start/prerequisites/) (Xcode CLT on macOS; WebView2 + MSVC build tools on Windows; `webkit2gtk-4.1`, `libxdo-dev` etc. on Linux), and opencode:
+**1. Get the engine**
 
 ```bash
 curl -fsSL https://opencode.ai/install | bash   # or: npm i -g opencode-ai
 opencode auth login                             # connect a provider
 ```
 
+**2. Run the app**
+
 ```bash
 cd apps/desktop
 npm install
 npm run tauri dev       # develop
-npm run tauri build     # installers: .dmg/.app, .msi/.exe, .AppImage/.deb/.rpm
+npm run tauri build     # installers: .dmg/.app · .msi/.exe · .AppImage/.deb/.rpm
 ```
 
-On first use, macOS asks for **Accessibility** permission (System Settings → Privacy & Security → Accessibility). It's needed to send ⌘C/⌘V for you. Installers are built per OS, so build on each platform or use the `tauri-action` GitHub Action.
+You'll need Node 18+, [Rust](https://rustup.rs) stable, and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your OS.
 
-Website: open `apps/web/index.html` directly or serve the folder (`npx serve apps/web`). The download buttons point to `#releases`; swap in your GitHub Releases URLs.
+**3. Grant Accessibility (macOS).** On first use, go to System Settings → Privacy & Security → Accessibility and allow unblurt. It needs this to send `⌘C`/`⌘V` for you.
 
-Set `UNBLURT_OPENCODE=/path/to/opencode` to override binary discovery.
+More detail in [`apps/desktop/README.md`](apps/desktop/README.md).
 
-## Why Tauri (and the alternatives)
+## ✦ Repo map
 
-| Option | Footprint | Notes |
+```
+unblurt/
+├── apps/
+│   ├── desktop/          Tauri 2 + React popover app (macOS, Windows, Linux)
+│   │   ├── src/          React UI: popover, settings, modes and prompts
+│   │   └── src-tauri/    Rust: hotkey, clipboard, keystrokes, opencode process
+│   └── web/              Marketing site: static HTML/CSS/JS, no build step
+└── brand/                Logo, app icon, tray icon, illustrations, creatives
+    ├── explorations/     Five logo directions (see the sheet below)
+    └── creatives/        Product shots, banner and social preview, rendered from HTML
+```
+
+| Folder | Read more |
+|---|---|
+| `apps/desktop` | [Desktop app →](apps/desktop/README.md) |
+| `apps/web` | [Website and deploy →](apps/web/README.md) |
+| `brand` | [Brand kit →](brand/README.md) |
+
+## ✦ Why Tauri
+
+| Option | Footprint | Verdict |
 |---|---|---|
-| **Tauri 2 + React** ✅ | ~10 MB app, ~40 MB RAM | Native webview, Rust for hotkeys/clipboard/keystrokes, one codebase for all 3 OSes. Best fit for an always-running utility. |
-| Electron + React | ~150 MB, 150+ MB RAM | Easiest JS-only path and very mature, but heavy for something that idles in the tray all day. |
-| Flutter desktop | ~30 MB | Good UI control, but global hotkeys and simulated paste need plugins of mixed quality. |
-| Native (SwiftUI + WinUI) | smallest | Best polish, but you'd write and maintain two apps. Worth it later for a mac-first premium feel. |
+| **Tauri 2 + React** ✅ | ~10 MB app, ~40 MB RAM | Native webview, Rust for hotkeys, clipboard and keystrokes, one codebase for three OSes. Right for an app that sits in the tray all day. |
+| Electron + React | ~150 MB, 150+ MB RAM | Mature and JS-only, but heavy for something that's always running. |
+| Flutter desktop | ~30 MB | Good UI control, but global hotkeys and simulated paste depend on uneven plugins. |
+| Native (SwiftUI + WinUI) | smallest | Most polish, but two apps to maintain. Worth revisiting for a premium Mac build. |
 
-## Design system
+## ✦ Brand
 
-Colours: petrol teal `#0F6B6A` (primary), persimmon `#FF7A45` (accent), warm stone `#EDE6DD`, ink `#101010`. Type: **Inter**, which is the closest free match to the Surety references, used at weight 500 with tight tracking for headlines. Manrope is the fallback option from the brand spec. Tokens are in `apps/desktop/src/styles.css` and `apps/web/assets/site.css`. The site follows the poster layout from the references: headline top-left, small "Note No." label top-right, a stone illustration panel, and the closing line bottom-right. The isometric illustrations are generated by `node brand/illustrations.mjs apps/web/assets`.
+<p align="center">
+  <img src="brand/explorations/sheet.png" alt="Five logo directions for unblurt" width="100%" />
+</p>
 
-## Known limits (v0.1)
+Petrol teal `#0F6B6A` · persimmon `#FF7A45` · warm stone `#EDE6DD` · ink `#101010` · set in **Inter**. The full kit is in [`brand/`](brand/README.md).
 
-- Clipboard restore keeps text only; an image on the clipboard is lost after a selection grab.
-- Linux Wayland blocks simulated keystrokes in many compositors, so you may need to paste manually there.
-- Rewrites aren't streamed yet; the window shows a working state until the full answer arrives.
+## ✦ Known limits (v0.1)
+
+- [ ] Clipboard restore keeps text only. An image on the clipboard is lost after a selection grab.
+- [ ] Wayland blocks simulated keystrokes in many compositors, so you may have to paste manually on Linux.
+- [ ] Rewrites aren't streamed yet. The popover shows a working state until the full answer arrives.
+
+---
+
+<p align="center">
+  <img src="brand/mark.svg" width="28" alt="" /><br />
+  <sub><b>your brain, unfiltered. your words, sorted.</b></sub>
+</p>

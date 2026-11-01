@@ -135,8 +135,6 @@ kbd {
   .poster-top { flex-direction: column-reverse; align-items: flex-start; }
 }
 
-.panel.lane img { animation: drift 14s ease-in-out infinite alternate; transform-origin: 30% 30%; }
-@keyframes drift { to { transform: scale(1.04) translate(-1%, -1%); } }
 
 /* ---------- sections ---------- */
 

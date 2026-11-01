@@ -3,8 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>unblurt — messy thoughts. clear writing.</title>
-  <meta name="description" content="Select text anywhere, press one shortcut, get it back written properly. Rephrase, draft emails and messages, reply — without opening a chat tab." />
+  <title>unblurt: messy thoughts. clear writing.</title>
+  <meta name="description" content="Select text anywhere, press one shortcut, get it back written properly. Rephrase, draft emails and messages, and reply without opening a chat tab." />
+  <meta property="og:title" content="unblurt: messy thoughts. clear writing." />
+  <meta property="og:description" content="Select text anywhere, press one shortcut, get it back written properly." />
+  <meta property="og:image" content="https://unblurt.vercel.app/assets/og.png" />
+  <meta property="og:url" content="https://unblurt.vercel.app/" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,12 +36,12 @@
         <h1 class="display">your brain,<br />unfiltered.</h1>
         <span class="label">Note No. 0001</span>
       </div>
-      <figure class="panel lane reveal">
-        <img src="assets/lane.svg" alt="A tangled orange ball of thought rolls down a teal lane and comes out the other end as a neat stack of written cards." />
+      <figure class="panel reveal">
+        <img src="assets/product-message.png" alt="A messy Slack draft is selected, and the unblurt popover in Message mode shows it rewritten as a clear reply, ready to paste." />
       </figure>
       <div class="poster-bottom">
         <div class="hero-cta reveal">
-          <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly — rephrased, drafted, replied to.</p>
+          <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly: rephrased, drafted, replied to.</p>
           <div class="row">
             <a class="btn primary" href="download.html" data-os-cta>Download</a>
             <a class="btn ghost" href="#how">See it work</a>
@@ -105,51 +110,17 @@
       <div class="reel-stage" id="reel" tabindex="0" aria-roledescription="carousel">
         <article class="reel-card">
           <div class="top"><h3>speak your mind.</h3><span class="no">Note No.<br />0003</span></div>
-          <div class="art">
-            <svg viewBox="0 0 500 350" aria-hidden="true">
-              <rect width="500" height="350" fill="#EDE6DD" />
-              <rect x="70" y="70" width="250" height="190" rx="62" fill="#0F6B6A" />
-              <path d="M112 226 Q108 290 84 318 Q142 302 184 252 Z" fill="#0F6B6A" />
-              <path d="M140 168 C 160 110, 250 118, 240 170 S 158 214, 182 160 S 292 116, 304 176 S 364 236, 430 150" fill="none" stroke="#FF7A45" stroke-width="13" stroke-linecap="round" />
-              <path d="M372 86 l14 -28 M404 104 l24 -22" stroke="#101010" stroke-width="8" stroke-linecap="round" />
-            </svg>
-          </div>
+          <div class="art"><img src="assets/product-rephrase.png" alt="Rephrase mode turning a rambling sentence in a doc into a clear one" loading="lazy" /></div>
           <p class="bottom">messy<br />is fine.</p>
         </article>
         <article class="reel-card">
           <div class="top"><h3>fix the chaos.</h3><span class="no">Note No.<br />0004</span></div>
-          <div class="art">
-            <svg viewBox="0 0 500 350" aria-hidden="true">
-              <rect width="500" height="350" fill="#EDE6DD" />
-              <path d="M40 180 C 60 90, 160 100, 140 170 S 50 250, 92 182 S 190 110, 196 196 S 110 268, 80 222 S 170 150, 226 175" fill="none" stroke="#FF7A45" stroke-width="10" stroke-linecap="round" />
-              <g fill="#0F6B6A">
-                <rect x="252" y="62" width="36" height="226" rx="12" />
-                <rect x="226" y="82" width="34" height="9" rx="4.5" /><rect x="226" y="112" width="34" height="9" rx="4.5" />
-                <rect x="226" y="142" width="34" height="9" rx="4.5" /><rect x="226" y="172" width="34" height="9" rx="4.5" />
-                <rect x="226" y="202" width="34" height="9" rx="4.5" /><rect x="226" y="232" width="34" height="9" rx="4.5" />
-                <rect x="226" y="262" width="34" height="9" rx="4.5" />
-              </g>
-              <g stroke="#FF7A45" stroke-width="10" stroke-linecap="round">
-                <path d="M312 102 H 460" /><path d="M312 142 H 440" /><path d="M312 182 H 462" /><path d="M312 222 H 420" /><path d="M312 262 H 448" />
-              </g>
-            </svg>
-          </div>
+          <div class="art"><img src="assets/product-fix.png" alt="Fix mode correcting spelling and grammar in release notes" loading="lazy" /></div>
           <p class="bottom">we'll sort<br />it out.</p>
         </article>
         <article class="reel-card">
           <div class="top"><h3>send something brilliant.</h3><span class="no">Note No.<br />0005</span></div>
-          <div class="art">
-            <svg viewBox="0 0 500 350" aria-hidden="true">
-              <rect width="500" height="350" fill="#EDE6DD" />
-              <circle cx="410" cy="84" r="42" fill="#FF7A45" />
-              <path d="M40 300 C 100 320, 180 230, 130 214 S 84 286, 196 250" fill="none" stroke="#0F6B6A" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 18" />
-              <g transform="translate(196 92)">
-                <path d="M0 120 L 236 0 L 128 186 Z" fill="#FFFFFF" />
-                <path d="M86 136 L 236 0 L 102 190 Z" fill="#DDD3C6" />
-                <path d="M86 136 L 102 190 L 126 160 Z" fill="#C7BBAB" />
-              </g>
-            </svg>
-          </div>
+          <div class="art"><img src="assets/product-reply.png" alt="Reply mode drafting a warm answer to a message from Alex" loading="lazy" /></div>
           <p class="bottom">every<br />time.</p>
         </article>
         <article class="reel-card">
@@ -159,7 +130,7 @@
         </article>
         <article class="reel-card">
           <div class="top"><h3>messy thoughts.</h3><span class="no">Note No.<br />0007</span></div>
-          <div class="art"><img src="assets/lane.svg" alt="" /></div>
+          <div class="art"><img src="assets/product-email.png" alt="Email mode turning a few rough notes into a polite overdue-invoice email" loading="lazy" /></div>
           <p class="bottom">clear<br />writing.</p>
         </article>
       </div>
@@ -189,12 +160,12 @@
         <article class="mode">
           <div class="mode-head"><h3>Email</h3><kbd><span data-mod>⌘</span>2</kbd></div>
           <p class="before">invoice late again, chase them, nicely but firm</p>
-          <p class="after">Subject: Invoice #2041 — now 14 days overdue …</p>
+          <p class="after">Subject: Invoice #2041, now 14 days overdue …</p>
         </article>
         <article class="mode">
           <div class="mode-head"><h3>Message</h3><kbd><span data-mod>⌘</span>3</kbd></div>
           <p class="before">running late 10 min start without me pls</p>
-          <p class="after">Running about 10 minutes late — go ahead and start without me.</p>
+          <p class="after">Running about 10 minutes late, so go ahead and start without me.</p>
         </article>
         <article class="mode">
           <div class="mode-head"><h3>Reply</h3><kbd><span data-mod>⌘</span>4</kbd></div>
@@ -227,10 +198,10 @@
     <section class="section wrap" style="padding-top: 0">
       <div class="steps">
         <div class="step reveal">
-          <div class="art-mini"><img src="assets/mark.svg" alt="" width="64" height="64" /></div>
+          <div class="art-mini"><span style="font-size: 17px; letter-spacing: -0.01em">ok so <span style="background: var(--persimmon-tint); padding: 3px 2px; border-radius: 3px">basically thursday prob</span> doesnt work</span></div>
           <span class="num">01</span>
           <h3>Select.</h3>
-          <p>Highlight text in any app — mail, chat, docs, a browser field. Or select nothing and just start typing.</p>
+          <p>Highlight text in any app: mail, chat, docs, a browser field. Or select nothing and just start typing.</p>
         </div>
         <div class="step reveal">
           <div class="art-mini"><span style="display: flex; gap: 6px"><kbd data-mod>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></span></div>
@@ -256,11 +227,11 @@
           <h2 class="h2">Your model.<br />Your machine.</h2>
           <p class="lede" style="margin-top: 22px">
             unblurt runs on <a href="https://opencode.ai" target="_blank" rel="noopener">opencode</a>, the open-source AI engine.
-            Plug in whichever model you already pay for — or one running on your laptop.
+            Plug in whichever model you already pay for, or one running on your laptop.
           </p>
         </div>
         <ul class="reveal">
-          <li><div><b>Bring any model.</b><span>Anthropic, OpenAI, Google, OpenRouter, local models — anything opencode can connect to.</span></div></li>
+          <li><div><b>Bring any model.</b><span>Anthropic, OpenAI, Google, OpenRouter, local models: anything opencode can connect to.</span></div></li>
           <li><div><b>No account with us.</b><span>unblurt talks to a private engine on 127.0.0.1. There is no unblurt server.</span></div></li>
           <li><div><b>Nothing kept.</b><span>Every rewrite uses a throwaway session that's deleted the moment you get your text.</span></div></li>
           <li><div><b>Native and tiny.</b><span>Built with Tauri. Lives in your menu bar or tray on macOS, Windows and Linux.</span></div></li>

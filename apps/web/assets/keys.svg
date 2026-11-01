@@ -17,5 +17,4 @@
 <rect transform="matrix(0.866 0.5 0.866 -0.5 250 130)" x="344" y="-72" width="456" height="144" rx="20" fill="#FFFFFF"/>
 <text transform="matrix(0.866 0.5 -0.866 0.5 617.18 302)" font-family="Inter, -apple-system, Helvetica, Arial, sans-serif" font-weight="500" font-size="38" fill="#101010">space</text>
 <path d="M 354.95 83.5 l 18 -36 M 396.95 101.5 l 28 -28" stroke="#101010" stroke-width="8" stroke-linecap="round"/>
-<circle cx="982.8" cy="450" r="26" fill="#FF7A45"/>
 </svg>

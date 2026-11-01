@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Product shot. Render: product.html#message or product.html#email at 1200x720. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--teal:#0F6B6A;--teal-tint:#E3EFEE;--pers:#FF7A45;--pers-tint:#FFD7C4;--stone:#EDE6DD;--stone-soft:#F6F2EC;--ink:#101010;--soft:#57534d;--faint:#9a948b;--line:rgba(16,16,16,.09)}
+body{width:100vw;height:100vh;overflow:hidden;font-family:Inter,sans-serif;color:var(--ink);background:var(--stone);position:relative;letter-spacing:-.01em}
+.stage{position:absolute;left:50%;top:50%;width:1200px;height:720px;transform:translate(-50%,-50%)}
+.doc h2{font-size:26px;font-weight:600;letter-spacing:-.03em}
+.doc p{color:#2b2925;font-size:17px;line-height:1.6}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(16,16,16,.12) 1.6px,transparent 1.8px);background-size:26px 26px}
+
+/* host app window */
+.win{position:absolute;left:70px;top:70px;width:700px;height:540px;background:#fff;border-radius:18px;box-shadow:0 30px 60px -20px rgba(16,16,16,.25),0 0 0 1px var(--line);overflow:hidden;display:flex;flex-direction:column}
+.bar{height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--stone-soft)}
+.bar i{width:12px;height:12px;border-radius:50%;background:#DDD3C6}
+.bar span{margin-left:12px;font-size:14px;font-weight:600;color:var(--soft)}
+.body{flex:1;padding:22px 26px;display:flex;flex-direction:column;gap:16px;font-size:16px;line-height:1.5}
+.msg{display:flex;gap:12px}
+.av{width:36px;height:36px;border-radius:10px;flex:none}
+.msg b{font-size:14px;display:block}
+.msg p{color:#2b2925}
+.composer{margin-top:auto;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-size:17px;line-height:1.55;min-height:120px}
+.sel{background:var(--pers-tint);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:2px 0;border-radius:3px}
+.field{display:flex;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;font-size:15px;color:var(--soft)}
+.field b{color:var(--ink);font-weight:500}
+
+/* shortcut */
+.keys{position:absolute;left:var(--kx,150px);top:var(--ky,330px);display:flex;gap:8px;transform:rotate(-4deg)}
+kbd{font-family:inherit;font-size:22px;font-weight:500;background:#FBF8F4;border-radius:12px;padding:10px 16px;box-shadow:0 4px 0 #DDD3C6,0 10px 20px -8px rgba(16,16,16,.3)}
+kbd.o{background:var(--pers);box-shadow:0 4px 0 #E25F2A,0 10px 20px -8px rgba(16,16,16,.3)}
+
+/* unblurt popover */
+.pop{position:absolute;right:56px;top:180px;width:520px;background:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -24px rgba(16,16,16,.4),0 0 0 1px var(--line)}
+.pbar{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:16px}
+.pbar .brand{display:flex;align-items:center;gap:9px}
+.pbar img{width:24px;height:24px}
+.tone{font-weight:450;font-size:14px;color:var(--soft);display:flex;align-items:center;gap:7px}
+.tone::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pers)}
+.modes{display:flex;gap:4px;flex-wrap:wrap}
+.modes span{padding:6px 11px;border-radius:999px;font-size:14px;font-weight:500;color:var(--soft)}
+.modes span.on{background:var(--teal);color:#fff}
+.sorted{font-size:14px;font-weight:600;color:var(--teal);padding:0 4px;margin-bottom:-4px}
+.out{background:var(--teal-tint);border-radius:14px;padding:14px 16px;font-size:16.5px;line-height:1.55;white-space:pre-wrap}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--faint)}
+.foot .act{display:flex;gap:6px}
+.foot b{font-weight:550;font-size:14px;padding:7px 12px;border-radius:10px;background:var(--teal);color:#fff}
+.foot b.ghost{background:var(--stone-soft);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="dots"></div>
+<div class="stage">
+<div class="win" id="win"></div>
+<div class="keys"><kbd>⌘</kbd><kbd class="o">⇧</kbd><kbd>Space</kbd></div>
+<div class="pop">
+  <div class="pbar"><span class="brand"><img id="logo" src="../mark.svg" alt="">unblurt</span><span class="tone" id="tone"></span></div>
+  <div class="modes" id="modes"></div>
+  <div class="sorted">sorted.</div>
+  <div class="out" id="out"></div>
+  <div class="foot"><span>⌘1–7 mode · ⌘T tone</span><span class="act"><b class="ghost">copy</b><b>paste ↵</b></span></div>
+</div>
+</div>
+<script>
+const S = {
+  message: {
+    mode: "Message", tone: "casual",
+    win: `<div class="bar"><i></i><i></i><i></i><span># launch-crew</span></div>
+      <div class="body">
+        <div class="msg"><div class="av" style="background:#8CC4BE"></div><div><b>Priya</b><p>Are we still good to ship Thursday? Need a yes/no for the client by EOD.</p></div></div>
+        <div class="msg"><div class="av" style="background:#FFB08C"></div><div><b>Sam</b><p>QA found two blockers this morning 👀</p></div></div>
+        <div class="composer"><span class="sel">ok so basically thursday prob doesnt work bc of the qa stuff sam mentioned, maybe monday?? need to check w design first tho, ill confirm tmrw</span></div>
+      </div>`,
+    out: "Thursday's probably not going to work because of the QA blockers Sam mentioned. Monday looks more realistic, but I need to check with design first. I'll confirm tomorrow.",
+  },
+  email: {
+    mode: "Email", tone: "warm", keys: ["110px", "470px"],
+    win: `<div class="bar"><i></i><i></i><i></i><span>New message</span></div>
+      <div class="body">
+        <div class="field">To <b>accounts@northwind.co</b></div>
+        <div class="field">Subject <b style="color:var(--faint);font-weight:400">…</b></div>
+        <div class="composer" style="margin-top:6px;border:0;padding:4px 0;font-size:18px;max-width:420px"><span class="sel">invoice 2041 late again, 14 days now. chase them, nicely but firm. mention we can do a payment plan if thats the issue</span></div>
+      </div>`,
+    out: "Subject: Invoice #2041, now 14 days overdue\n\nHi there, a quick reminder that invoice #2041 is now 14 days past due. Could you let me know when we can expect payment?\n\nIf the timing is difficult, we're happy to set up a payment plan.\n\nThanks so much!",
+  },
+  rephrase: {
+    mode: "Rephrase", tone: "neutral", keys: ["110px", "500px"],
+    win: `<div class="bar"><i></i><i></i><i></i><span>Q3 update.doc</span></div>
+      <div class="body doc">
+        <h2>Q3 roadmap</h2>
+        <p style="max-width:430px">Search and onboarding shipped on time and adoption is up 18% since launch.</p>
+        <p style="max-width:430px"><span class="sel">so basically what im trying to say is the timeline for billing doesnt really work for us and we need like more time to do it properly</span></p>
+      </div>`,
+    out: "The billing timeline doesn't work for us as it stands. We need more time to do it properly.",
+  },
+  fix: {
+    mode: "Fix", tone: null, keys: ["110px", "500px"],
+    win: `<div class="bar"><i></i><i></i><i></i><span>Release notes</span></div>
+      <div class="body doc">
+        <h2>What's new in 2.4</h2>
+        <p style="max-width:430px"><span class="sel">their going to love the new export, its alot faster then before and the onboarding is way more smoother to.</span></p>
+      </div>`,
+    out: "They're going to love the new export. It's a lot faster than before, and the onboarding is much smoother too.",
+  },
+  reply: {
+    mode: "Reply", tone: "warm", keys: ["150px", "300px"],
+    win: `<div class="bar"><i></i><i></i><i></i><span>Alex Chen</span></div>
+      <div class="body">
+        <div class="msg"><div class="av" style="background:#8CC4BE"></div><div style="max-width:400px"><b>Alex</b><p><span class="sel">Hey! Any chance you could look over the pitch deck before Friday? Totally fine if you're slammed this week.</span></p></div></div>
+        <div class="composer" style="color:var(--faint)">+ yes, thursday afternoon works</div>
+      </div>`,
+    out: "Of course! I can go through it Thursday afternoon. Send it over whenever it's ready and I'll get notes back to you before the pitch.",
+  },
+};
+const s = S[location.hash.slice(1)] || S.message;
+if (s.keys) { document.body.style.setProperty("--kx", s.keys[0]); document.body.style.setProperty("--ky", s.keys[1]); }
+win.innerHTML = s.win;
+if (s.tone) tone.textContent = s.tone; else tone.remove();
+out.textContent = s.out;
+const params = new URLSearchParams(location.search);
+if (params.get("logo")) logo.src = params.get("logo");
+modes.innerHTML = ["Rephrase","Email","Message","Reply","Shorter","Fix","Ask"].map(m => `<span class="${m===s.mode?"on":""}">${m}</span>`).join("");
+</script>
+</body>
+</html>

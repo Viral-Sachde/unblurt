@@ -129,6 +129,8 @@
       const r = track.getBoundingClientRect();
       const run = r.height - stage.offsetHeight;
       const p = Math.min(1, Math.max(0, -r.top / run));
+      // the hint bubble rises once the scene has pinned to the screen
+      track.classList.toggle("near", r.top <= innerHeight * 0.35 && r.bottom > innerHeight);
       apply(Math.min(6, Math.floor(p * 7)));
     };
     addEventListener("scroll", () => ticking || ((ticking = true), requestAnimationFrame(onScroll)), { passive: true });

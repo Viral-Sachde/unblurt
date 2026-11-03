@@ -40,7 +40,7 @@ export function Settings() {
     const next = savePrefs(patch);
     setPrefs(next);
     // the storage event doesn't fire in the window that wrote it, so tell the app directly
-    if ("plate" in patch) api.setPlate(next.plate).catch(() => {});
+    if ("plate" in patch) api.setPlate(next.plate, next.plateEdge, next.plateOffset, next.plateMonitor).catch(() => {});
   };
 
   const chooseHotkey = async (accel: string) => {
@@ -214,9 +214,22 @@ export function Settings() {
           </button>
         </div>
         <p className="muted small">
-          A slim tab on the left edge of your screen. Drag selected text onto it to open unblurt, or hover it for
-          Rephrase, Shorter and Clipboard. The original text stays where it is.
+          A slim tab on the edge of your screen. Drag selected text onto it to open unblurt, or hover it for
+          Rephrase, Shorter and Clipboard. The original text stays where it is. Grab its dots to move it to any
+          side or corner.
         </p>
+        {(prefs.plateEdge !== "left" || prefs.plateOffset !== 0.5) && (
+          <button
+            className="ghost"
+            onClick={() => {
+              const next = savePrefs({ plateEdge: "left", plateOffset: 0.5, plateMonitor: null });
+              setPrefs(next);
+              api.setPlate(next.plate, "left", 0.5, null).catch(() => {});
+            }}
+          >
+            move it back to the left
+          </button>
+        )}
       </section>
 
       <section className="panel">

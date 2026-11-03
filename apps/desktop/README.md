@@ -45,7 +45,7 @@ Installers only build for the OS you're on. Build on each platform, or use [`tau
 ```
 src/
 ├── popover/Popover.tsx    The window that appears on the shortcut: modes, tone, note, result
-├── plate/Plate.tsx        The left screen edge plate: drop text on it, or hover for Rephrase, Shorter, Clipboard
+├── plate/Plate.tsx        The screen edge plate: drop text on it, hover for Rephrase, Shorter, Clipboard, drag it anywhere
 ├── settings/Settings.tsx  Engine status, model picker, shortcut, plate, default tone
 ├── lib/modes.ts           The seven modes, five tones and the prompt builder (edit prompts here)
 ├── lib/api.ts             Typed wrappers around the Tauri commands
@@ -55,13 +55,16 @@ src/
 
 src-tauri/src/
 ├── lib.rs        App setup, tray, global shortcut, window handling, Tauri commands
+├── plate_pos.rs  Which edge the plate is on and where: placement and snap maths (unit-tested)
 ├── keys.rs       Grabs the selection (simulated copy) and pastes the result back, restoring the clipboard
 └── opencode.rs   Finds opencode, runs a private `opencode serve`, creates and deletes sessions, reports status
 ```
 
-**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `suspend_hotkey` · `plate_drop` · `plate_action` · `size_plate` · `set_plate` · `quit`
+**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `suspend_hotkey` · `plate_drop` · `plate_action` · `size_plate` · `plate_drag` · `set_plate` · `quit`
 
-**The plate** is its own window (`label: "plate"`) that is never focusable, so clicking or dropping on it leaves the app you were in frontmost. `dragDropEnabled` is off for it so the webview gets real HTML drag events with the dropped text. It is 16px wide at rest, opens a three-button rail on hover (Rephrase, Shorter, Clipboard) and a landing pad while text is dragged over it.
+**The plate** is its own window (`label: "plate"`) that is never focusable, so clicking or dropping on it leaves the app you were in frontmost. `dragDropEnabled` is off for it so the webview gets real HTML drag events with the dropped text. It is 16px wide at rest, opens a rail on hover (a grip, then Rephrase, Shorter, Clipboard) and a landing pad while text is dragged over it.
+
+**Moving it:** hold the grip and drag. On macOS the app moves the window with the cursor itself (the OS window-drag can hold the window after release and override the snap); on release it snaps to the nearest edge of that screen, or tucks into a corner when dropped near one. `plate_pos.rs` has the snap and placement maths, with unit tests. The edge, the spot along it and the screen are saved in prefs, and the plate turns to fit: vertical on the sides, horizontal on the top and bottom. Run with `UNBLURT_DEBUG=1` to log drags, snaps and placements.
 
 Two macOS details shape it:
 - A window that never takes focus gets no hover events while another app is active, so Rust watches the cursor (`plate-pointer` events) and the plate opens and highlights from that.

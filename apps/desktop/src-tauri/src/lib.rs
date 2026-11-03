@@ -1,8 +1,10 @@
 mod front;
 mod keys;
+mod plate_pos;
 mod opencode;
 
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
 use std::time::Duration;
 
 use serde::Serialize;
@@ -12,6 +14,7 @@ use tauri::{AppHandle, Emitter, LogicalSize, Manager, PhysicalPosition, RunEvent
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 use opencode::{Engine, Models, Status, TransformRequest};
+use plate_pos::{Area, Edge, PlatePos};
 
 const DEFAULT_HOTKEY: &str = "CommandOrControl+Shift+Space";
 
@@ -34,6 +37,43 @@ struct PlatePointer {
 
 /// Whether the plate is on screen; read by the pointer watcher without touching the main thread.
 static PLATE_ON: AtomicBool = AtomicBool::new(false);
+/// Which edge of which screen the plate lives on (saved in prefs by the plate window).
+static PLATE_POS: Mutex<PlatePos> = Mutex::new(PlatePos::DEFAULT);
+/// True while the user is dragging the plate to a new spot.
+static PLATE_DRAGGING: AtomicBool = AtomicBool::new(false);
+/// The plate window's size as last requested (logical px). Used instead of asking the window,
+/// which keeps reporting the old size for a moment after a resize.
+static PLATE_SIZE: Mutex<(f64, f64)> = Mutex::new((16.0, 176.0));
+
+/// `UNBLURT_DEBUG=1` prints what the plate is doing (moves, snaps) to stderr.
+macro_rules! debug_log {
+    ($($arg:tt)*) => {
+        if std::env::var_os("UNBLURT_DEBUG").is_some() {
+            eprintln!("[unblurt] {}", format!($($arg)*));
+        }
+    };
+}
+
+fn plate_size() -> (f64, f64) {
+    PLATE_SIZE.lock().map(|s| *s).unwrap_or((16.0, 176.0))
+}
+
+fn plate_pos() -> PlatePos {
+    PLATE_POS.lock().map(|p| p.clone()).unwrap_or(PlatePos::DEFAULT)
+}
+
+fn area_of(m: &tauri::Monitor) -> Area {
+    let a = m.work_area();
+    Area { x: a.position.x, y: a.position.y, w: a.size.width as i32, h: a.size.height as i32 }
+}
+
+/// The screen the plate belongs on: the one it was dropped on if it's still connected, else the main one.
+fn plate_monitor(app: &AppHandle, pos: &PlatePos) -> Option<tauri::Monitor> {
+    let named = pos.monitor.as_ref().and_then(|name| {
+        app.available_monitors().ok()?.into_iter().find(|m| m.name().is_some_and(|n| n == name))
+    });
+    named.or_else(|| app.primary_monitor().ok().flatten())
+}
 
 fn popover(app: &AppHandle) -> Option<WebviewWindow> {
     app.get_webview_window("popover")
@@ -75,14 +115,46 @@ fn open_with(app: &AppHandle, summon: Summon, beside_plate: bool) {
     });
 }
 
-/// The plate hugs the left edge of the main screen, vertically centred in the usable area.
+/// Puts the plate flush against its edge (left by default), at its saved spot along that edge.
+/// Uses the size we last asked for: right after a resize the window can still report its old
+/// size, which would leave a shrinking plate floating short of its edge.
 fn place_plate(app: &AppHandle) {
     let Some(win) = plate(app) else { return };
-    let monitor = app.primary_monitor().ok().flatten().or_else(|| win.current_monitor().ok().flatten());
-    let (Some(m), Ok(size)) = (monitor, win.outer_size()) else { return };
-    let area = m.work_area();
-    let y = area.position.y + (area.size.height as i32 - size.height as i32) / 2;
-    let _ = win.set_position(PhysicalPosition::new(area.position.x, y));
+    let pos = plate_pos();
+    let monitor = plate_monitor(app, &pos).or_else(|| win.current_monitor().ok().flatten());
+    let Some(m) = monitor else { return };
+    let (lw, lh) = plate_size();
+    let scale = m.scale_factor();
+    let (w, h) = ((lw * scale).round() as i32, (lh * scale).round() as i32);
+    let (x, y) = plate_pos::place(area_of(&m), w, h, pos.edge, pos.offset);
+    debug_log!("place: {:?} {:.2} {}x{} -> {},{}", pos.edge, pos.offset, w, h, x, y);
+    let _ = win.set_position(PhysicalPosition::new(x, y));
+}
+
+/// Where the plate was let go (the cursor at release, in physical pixels): snap to the nearest
+/// edge (or corner) of that screen, remember it, tell the plate window (it saves the spot and
+/// turns to fit the edge), and re-place it.
+fn snap_plate(app: &AppHandle, (cx, cy): (f64, f64)) {
+    let Some(win) = plate(app) else { return };
+    let monitor = app.monitor_from_point(cx, cy).ok().flatten().or_else(|| win.current_monitor().ok().flatten());
+    let Some(m) = monitor else { return };
+    let (edge, offset) = plate_pos::snap(area_of(&m), cx, cy);
+    debug_log!("snap: released at {cx:.0},{cy:.0} -> {edge:?} {offset:.2}");
+    let pos = PlatePos { edge, offset, monitor: m.name().cloned() };
+    if let Ok(mut cur) = PLATE_POS.lock() {
+        *cur = pos.clone();
+    }
+    let _ = app.emit_to("plate", "plate-moved", pos);
+    place_plate(app);
+}
+
+#[cfg(target_os = "macos")]
+fn mouse_down() -> Option<bool> {
+    Some(objc2_app_kit::NSEvent::pressedMouseButtons() & 1 == 1)
+}
+#[cfg(not(target_os = "macos"))]
+fn mouse_down() -> Option<bool> {
+    None
 }
 
 /// The plate's window never becomes key, so macOS doesn't send it hover events while another app
@@ -99,13 +171,12 @@ fn watch_plate_pointer(app: AppHandle) {
             // keep note of the app you're working in, before a click on the plate activates us
             front::track();
             let Some(win) = plate(&app) else { continue };
-            let (Ok(c), Ok(pos), Ok(size), Ok(scale)) =
-                (app.cursor_position(), win.outer_position(), win.outer_size(), win.scale_factor())
-            else {
+            let (Ok(c), Ok(pos), Ok(scale)) = (app.cursor_position(), win.outer_position(), win.scale_factor()) else {
                 continue;
             };
+            let (lw, lh) = plate_size();
             let (dx, dy) = (c.x - pos.x as f64, c.y - pos.y as f64);
-            let inside = dx >= 0.0 && dy >= 0.0 && dx < size.width as f64 && dy < size.height as f64;
+            let inside = dx >= 0.0 && dy >= 0.0 && dx < lw * scale && dy < lh * scale;
             let now = if inside {
                 PlatePointer { inside, x: (dx / scale) as i32, y: (dy / scale) as i32 }
             } else {
@@ -119,20 +190,26 @@ fn watch_plate_pointer(app: AppHandle) {
     });
 }
 
-/// Opens the popover just right of the plate, centred on it, kept on screen.
+/// Opens the popover next to the plate, on the inside of whichever edge it's on, lined up with it
+/// and kept on screen.
 fn place_beside_plate(app: &AppHandle, win: &WebviewWindow) -> bool {
     let Some(p) = plate(app) else { return false };
     let (Ok(pp), Ok(ps), Ok(size), Some(m)) = (p.outer_position(), p.outer_size(), win.outer_size(), p.current_monitor().ok().flatten())
     else {
         return false;
     };
-    let area = m.work_area();
-    let scale = m.scale_factor();
-    let x = area.position.x + (24.0 * scale) as i32;
-    let centre = pp.y + ps.height as i32 / 2;
-    let top = area.position.y;
-    let bottom = area.position.y + area.size.height as i32 - size.height as i32;
-    let y = (centre - size.height as i32 / 2).clamp(top, bottom.max(top));
+    let a = area_of(&m);
+    let gap = (24.0 * m.scale_factor()) as i32;
+    let (w, h) = (size.width as i32, size.height as i32);
+    let clamp_x = |x: i32| x.clamp(a.x, (a.x + a.w - w).max(a.x));
+    let clamp_y = |y: i32| y.clamp(a.y, (a.y + a.h - h).max(a.y));
+    let (cx, cy) = (pp.x + ps.width as i32 / 2, pp.y + ps.height as i32 / 2);
+    let (x, y) = match plate_pos().edge {
+        Edge::Left => (a.x + gap, clamp_y(cy - h / 2)),
+        Edge::Right => (a.x + a.w - w - gap, clamp_y(cy - h / 2)),
+        Edge::Top => (clamp_x(cx - w / 2), a.y + gap),
+        Edge::Bottom => (clamp_x(cx - w / 2), a.y + a.h - h - gap),
+    };
     let _ = win.set_position(PhysicalPosition::new(x, y));
     true
 }
@@ -269,13 +346,108 @@ fn plate_action(app: AppHandle, mode: Option<String>, clipboard: bool) {
 #[tauri::command]
 fn size_plate(app: AppHandle, width: f64, height: f64) {
     let Some(win) = plate(&app) else { return };
+    if let Ok(mut s) = PLATE_SIZE.lock() {
+        *s = (width, height);
+    }
     let _ = win.set_size(LogicalSize::new(width, height));
     place_plate(&app);
 }
 
+/// Grab the plate by its grip: it follows the cursor while the button is held, and when it's
+/// released the plate snaps to the nearest edge or corner of that screen.
+///
+/// On macOS the app moves the window itself instead of handing it to the OS window-drag: the OS
+/// drag can hold on to the window after the button goes up and override the snap.
 #[tauri::command]
-fn set_plate(app: AppHandle, visible: bool) {
+fn plate_drag(app: AppHandle) {
     let Some(win) = plate(&app) else { return };
+    if PLATE_DRAGGING.swap(true, Ordering::SeqCst) {
+        return;
+    }
+    let finish = |app: AppHandle, point: (f64, f64)| {
+        let handle = app.clone();
+        let _ = app.run_on_main_thread(move || snap_plate(&handle, point));
+        // and once more after the window has settled into its new size
+        std::thread::sleep(Duration::from_millis(300));
+        let handle = app.clone();
+        let _ = app.run_on_main_thread(move || {
+            place_plate(&handle);
+            PLATE_DRAGGING.store(false, Ordering::SeqCst);
+        });
+    };
+
+    if mouse_down().is_some() {
+        // we can see the mouse button: follow the cursor ourselves
+        let (Ok(c), Ok(p)) = (app.cursor_position(), win.outer_position()) else {
+            PLATE_DRAGGING.store(false, Ordering::SeqCst);
+            return;
+        };
+        let grab = (c.x - p.x as f64, c.y - p.y as f64);
+        debug_log!("drag: follow cursor, grabbed at {grab:?}");
+        std::thread::spawn(move || {
+            let mut point = (c.x, c.y);
+            for _ in 0..(60 * 60 * 2) {
+                if mouse_down() != Some(true) {
+                    break;
+                }
+                if let Ok(c) = app.cursor_position() {
+                    point = (c.x, c.y);
+                    let (x, y) = ((c.x - grab.0).round() as i32, (c.y - grab.1).round() as i32);
+                    let handle = app.clone();
+                    let _ = app.run_on_main_thread(move || {
+                        if let Some(w) = plate(&handle) {
+                            let _ = w.set_position(PhysicalPosition::new(x, y));
+                        }
+                    });
+                }
+                std::thread::sleep(Duration::from_millis(16));
+            }
+            debug_log!("drag: released at {point:?}");
+            finish(app, point);
+        });
+        return;
+    }
+
+    // no access to the button state: let the OS drag the window, and snap once it holds still
+    let _ = win.start_dragging();
+    std::thread::spawn(move || {
+        let mut last = None;
+        let mut still = 0;
+        for _ in 0..600 {
+            std::thread::sleep(Duration::from_millis(40));
+            let pos = plate(&app).and_then(|w| w.outer_position().ok());
+            still = if pos.is_some() && pos == last { still + 1 } else { 0 };
+            if still >= 10 {
+                break;
+            }
+            last = pos;
+        }
+        let point = plate(&app).and_then(|w| {
+            let (p, s) = (w.outer_position().ok()?, w.outer_size().ok()?);
+            Some((p.x as f64 + s.width as f64 / 2.0, p.y as f64 + s.height as f64 / 2.0))
+        });
+        match point {
+            Some(point) => finish(app, point),
+            None => PLATE_DRAGGING.store(false, Ordering::SeqCst),
+        }
+    });
+}
+
+/// `edge`/`offset`/`monitor` come from the saved prefs; omitted ones keep the current value.
+#[tauri::command]
+fn set_plate(app: AppHandle, visible: bool, edge: Option<Edge>, offset: Option<f64>, monitor: Option<String>) {
+    let Some(win) = plate(&app) else { return };
+    if let Ok(mut pos) = PLATE_POS.lock() {
+        if let Some(e) = edge {
+            pos.edge = e;
+        }
+        if let Some(o) = offset {
+            pos.offset = o.clamp(0.0, 1.0);
+        }
+        if edge.is_some() {
+            pos.monitor = monitor;
+        }
+    }
     PLATE_ON.store(visible, Ordering::Relaxed);
     if visible {
         place_plate(&app);
@@ -323,6 +495,7 @@ pub fn run() {
             plate_drop,
             plate_action,
             size_plate,
+            plate_drag,
             set_plate,
             quit
         ])

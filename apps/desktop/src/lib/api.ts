@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { PlateEdge } from "./prefs";
 
 export interface ModelRef {
   providerID: string;
@@ -33,7 +34,11 @@ export const api = {
   plateDrop: (text: string) => invoke<void>("plate_drop", { text }),
   plateAction: (mode: string | null, clipboard: boolean) => invoke<void>("plate_action", { mode, clipboard }),
   sizePlate: (width: number, height: number) => invoke<void>("size_plate", { width, height }),
-  setPlate: (visible: boolean) => invoke<void>("set_plate", { visible }),
+  /** Shows or hides the plate; edge/offset/monitor (from prefs) say where it goes. */
+  setPlate: (visible: boolean, edge?: PlateEdge, offset?: number, monitor?: string | null) =>
+    invoke<void>("set_plate", { visible, edge, offset, monitor }),
+  /** Starts moving the plate with the cursor; Rust snaps it to an edge on release ("plate-moved"). */
+  plateDrag: () => invoke<void>("plate_drag"),
   quit: () => invoke<void>("quit"),
 };
 

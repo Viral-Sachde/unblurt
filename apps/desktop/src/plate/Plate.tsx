@@ -3,9 +3,10 @@ import { listen } from "@tauri-apps/api/event";
 import { Mark } from "../components/Mark";
 import { api } from "../lib/api";
 import { type ModeId } from "../lib/modes";
-import { loadPrefs } from "../lib/prefs";
+import { loadPrefs, savePrefs, type PlateEdge } from "../lib/prefs";
 
-// The plate: a slim tab on the left edge of the screen.
+// The plate: a slim tab on an edge of the screen (left by default; drag it by the grip to any
+// side or corner).
 //  - hover: a small rail of quick actions (Rephrase, Shorter on your selection; or the clipboard).
 //    It hides again as soon as the cursor leaves, so there is no close button.
 //  - drag text onto it: a landing pad; drop to open unblurt with that text
@@ -15,9 +16,16 @@ import { loadPrefs } from "../lib/prefs";
 
 type State = "idle" | "menu" | "drag" | "got";
 
-// Window size per state, in logical px. Rust resizes around the vertical centre.
-// The menu window is wider than the rail so each button's label fits beside it.
-const SIZE: Record<State, [number, number]> = { idle: [16, 176], menu: [176, 176], drag: [248, 176], got: [248, 176] };
+// Window size per state, in logical px, for a plate on a side (left/right) or on the top/bottom.
+// Rust re-pins the window to its edge after every resize. The menu window is bigger than the rail
+// so each button's label fits next to it.
+const SIZE: Record<"side" | "flat", Record<State, [number, number]>> = {
+  side: { idle: [16, 176], menu: [176, 176], drag: [248, 176], got: [248, 176] },
+  flat: { idle: [176, 16], menu: [236, 104], drag: [248, 176], got: [248, 176] },
+};
+const orient = (e: PlateEdge) => (e === "left" || e === "right" ? "side" : "flat");
+
+type Moved = { edge: PlateEdge; offset: number; monitor: string | null };
 const LEAVE_GRACE_MS = 320;
 
 type Action = { kind: "mode"; mode: ModeId } | { kind: "clipboard" };
@@ -47,6 +55,7 @@ const hasText = (e: React.DragEvent) => Array.from(e.dataTransfer.types).include
 
 export function Plate() {
   const [state, setState] = useState<State>("idle");
+  const [edge, setEdge] = useState<PlateEdge>(() => loadPrefs().plateEdge);
   const [hot, setHot] = useState<string | null>(null);
   const [pressed, setPressed] = useState<string | null>(null);
   const depth = useRef(0); // dragenter/dragleave fire for children too; count them
@@ -54,9 +63,13 @@ export function Plate() {
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  // Show or hide the plate from the saved preference, and follow changes made in settings.
+  // Show or hide the plate, at its saved spot, and follow changes made in settings.
   useEffect(() => {
-    const apply = () => api.setPlate(loadPrefs().plate).catch(() => {});
+    const apply = () => {
+      const p = loadPrefs();
+      setEdge(p.plateEdge);
+      api.setPlate(p.plate, p.plateEdge, p.plateOffset, p.plateMonitor).catch(() => {});
+    };
     apply();
     const onStorage = (e: StorageEvent) => e.key?.startsWith("unblurt.") && apply();
     window.addEventListener("storage", onStorage);
@@ -64,10 +77,22 @@ export function Plate() {
   }, []);
 
   useEffect(() => {
-    const [w, h] = SIZE[state];
+    const [w, h] = SIZE[orient(edge)][state];
     api.sizePlate(w, h).catch(() => {});
     if (state !== "menu") setHot(null);
-  }, [state]);
+  }, [state, edge]);
+
+  // Dropped somewhere new: remember the spot and turn to fit that edge.
+  useEffect(() => {
+    const un = listen<Moved>("plate-moved", ({ payload }) => {
+      savePrefs({ plateEdge: payload.edge, plateOffset: payload.offset, plateMonitor: payload.monitor });
+      setEdge(payload.edge);
+      setState("idle");
+    });
+    return () => {
+      un.then((f) => f());
+    };
+  }, []);
 
   // Pointer reports from Rust: open the menu on arrival, highlight the row under the cursor,
   // close shortly after the cursor leaves.
@@ -123,7 +148,7 @@ export function Plate() {
 
   return (
     <div
-      className={`plate-stage s-${state}`}
+      className={`plate-stage s-${state} edge-${edge} ${orient(edge)}`}
       onDragEnter={(e) => {
         if (!hasText(e)) return;
         e.preventDefault();
@@ -154,6 +179,23 @@ export function Plate() {
     >
       {state === "menu" ? (
         <div className="plate-rail" role="menu" aria-label="unblurt quick actions">
+          <span
+            className={`pr-grip${hot === "grip" ? " hot" : ""}`}
+            data-row="grip"
+            role="button"
+            aria-label="Drag to move the plate"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              api.plateDrag().catch(() => {});
+            }}
+          >
+            <svg viewBox="0 0 12 8" aria-hidden="true">
+              <circle cx="2" cy="2" r="1.1" /><circle cx="6" cy="2" r="1.1" /><circle cx="10" cy="2" r="1.1" />
+              <circle cx="2" cy="6" r="1.1" /><circle cx="6" cy="6" r="1.1" /><circle cx="10" cy="6" r="1.1" />
+            </svg>
+            <span className="pr-tip">Drag to move</span>
+          </span>
           {rail("rephrase", { kind: "mode", mode: "rephrase" }, "Rephrase", ICONS.rephrase, true)}
           {rail("shorten", { kind: "mode", mode: "shorten" }, "Shorter", ICONS.shorter)}
           <span className="pr-sep" />

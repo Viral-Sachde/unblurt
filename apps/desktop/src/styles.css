@@ -196,7 +196,7 @@ html[data-window="settings"] body { background: var(--stone-soft); }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-faint); word-break: break-all; }
 .settings-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
 
-/* ---------- plate (left screen edge drop target) ---------- */
+/* ---------- plate (screen edge drop target; left by default, can sit on any edge) ---------- */
 
 html[data-window="plate"], html[data-window="plate"] body { background: transparent; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
@@ -265,3 +265,57 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
 }
 .pr-btn.hot .pr-tip, .pr-btn:hover .pr-tip { opacity: 1; transform: translate(0, -50%); }
 .pr-sep { width: 20px; height: 1px; background: var(--line); margin: 3px 0; }
+
+/* the grip: grab it to move the plate to any side or corner */
+.pr-grip {
+  position: relative; width: 34px; height: 16px; border-radius: 7px; display: grid; place-items: center;
+  color: var(--ink-faint); cursor: grab; transition: background 90ms, color 90ms;
+}
+.pr-grip svg { width: 14px; height: 9px; fill: currentColor; }
+.pr-grip.hot, .pr-grip:hover { background: var(--stone-soft); color: var(--ink-soft); }
+.pr-grip:active { cursor: grabbing; }
+.pr-grip.hot .pr-tip, .pr-grip:hover .pr-tip { opacity: 1; transform: translate(0, -50%); }
+
+/* ---- other edges: the same pieces, turned to face the middle of the screen ---- */
+
+/* where things sit inside the window */
+.edge-right { justify-content: flex-end; }
+.edge-top { align-items: flex-start; justify-content: center; }
+.edge-bottom { align-items: flex-end; justify-content: center; }
+
+/* resting tab */
+.edge-right .plate { border-radius: 10px 0 0 10px; }
+.flat .plate { width: 64px; height: 6px; }
+.edge-top .plate { border-radius: 0 0 10px 10px; }
+.edge-bottom .plate { border-radius: 10px 10px 0 0; }
+
+/* landing pad */
+.edge-right.s-drag .plate, .edge-right.s-got .plate { border-radius: 18px 0 0 18px; }
+.edge-right.s-drag .plate::after { inset: 8px 0 8px 8px; border-radius: 12px 0 0 12px; border: 1.5px dashed var(--persimmon); border-right: 0; }
+.flat.s-drag .plate, .flat.s-got .plate { width: 224px; height: 132px; }
+.edge-top.s-drag .plate, .edge-top.s-got .plate { border-radius: 0 0 18px 18px; }
+.edge-top.s-drag .plate::after { inset: 0 8px 8px 8px; border-radius: 0 0 12px 12px; border: 1.5px dashed var(--persimmon); border-top: 0; }
+.edge-bottom.s-drag .plate, .edge-bottom.s-got .plate { border-radius: 18px 18px 0 0; }
+.edge-bottom.s-drag .plate::after { inset: 8px 8px 0 8px; border-radius: 12px 12px 0 0; border: 1.5px dashed var(--persimmon); border-bottom: 0; }
+
+/* rail: vertical on the sides, horizontal on the top and bottom */
+.edge-right .plate-rail { padding: 7px 5px 7px 6px; border-radius: 16px 0 0 16px; animation-name: pr-in-right; }
+.flat .plate-rail { flex-direction: row; padding: 5px 7px; }
+.edge-top .plate-rail { border-radius: 0 0 16px 16px; padding-top: 5px; animation-name: pr-in-top; }
+.edge-bottom .plate-rail { border-radius: 16px 16px 0 0; animation-name: pr-in-bottom; }
+@keyframes pr-in-right { from { opacity: 0; transform: translateX(10px); } }
+@keyframes pr-in-top { from { opacity: 0; transform: translateY(-10px); } }
+@keyframes pr-in-bottom { from { opacity: 0; transform: translateY(10px); } }
+.flat .pr-sep { width: 1px; height: 20px; margin: 0 3px; }
+.flat .pr-grip { width: 16px; height: 34px; }
+.flat .pr-grip svg { transform: rotate(90deg); }
+
+/* labels: beside the button on the sides, below or above it on the top and bottom */
+.edge-right .pr-tip { left: auto; right: calc(100% + 10px); transform: translate(4px, -50%); }
+.edge-right .pr-btn.hot .pr-tip, .edge-right .pr-btn:hover .pr-tip,
+.edge-right .pr-grip.hot .pr-tip, .edge-right .pr-grip:hover .pr-tip { transform: translate(0, -50%); }
+.flat .pr-tip { left: 50%; transform: translate(-50%, -4px); }
+.edge-top .pr-tip { top: calc(100% + 9px); }
+.edge-bottom .pr-tip { top: auto; bottom: calc(100% + 9px); transform: translate(-50%, 4px); }
+.flat .pr-btn.hot .pr-tip, .flat .pr-btn:hover .pr-tip,
+.flat .pr-grip.hot .pr-tip, .flat .pr-grip:hover .pr-tip { transform: translate(-50%, 0); }

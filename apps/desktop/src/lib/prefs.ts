@@ -6,9 +6,15 @@ export interface Prefs {
   tone: Tone;
   model: ModelRef | null;
   hotkey: string;
-  /** The drop target on the left edge of the screen. */
+  /** The drop target on the edge of the screen. */
   plate: boolean;
+  /** Which screen edge the plate sits on, how far along it (0 to 1), and which screen. */
+  plateEdge: PlateEdge;
+  plateOffset: number;
+  plateMonitor: string | null;
 }
+
+export type PlateEdge = "left" | "right" | "top" | "bottom";
 
 export const isMac = navigator.userAgent.includes("Mac");
 
@@ -20,7 +26,7 @@ export const HOTKEYS = [
 ];
 
 const KEY = "unblurt.prefs";
-const DEFAULTS: Prefs = { mode: "rephrase", tone: "neutral", model: null, hotkey: HOTKEYS[0].accel, plate: true };
+const DEFAULTS: Prefs = { mode: "rephrase", tone: "neutral", model: null, hotkey: HOTKEYS[0].accel, plate: true, plateEdge: "left", plateOffset: 0.5, plateMonitor: null };
 
 // localStorage is shared by the popover and settings windows (same origin),
 // and the `storage` event keeps them in sync.

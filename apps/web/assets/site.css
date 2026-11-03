@@ -179,7 +179,6 @@ section { scroll-margin-top: 64px; }
   display: flex; gap: 10px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 3;
 }
 .keys-overlay.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.keys-overlay.press .cap { transform: translateY(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 1px 0 var(--wall), 0 6px 12px -8px rgba(16, 16, 16, 0.4); }
 
 /* the popover, mirroring the desktop app */
 .pop {
@@ -388,28 +387,42 @@ section { scroll-margin-top: 64px; }
 .byline a { text-decoration: none; align-self: flex-start; }
 .byline a:hover b { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- keycaps (hero tiles, demo overlay, story chip) ---------- */
+/* ---------- keycaps (hero, demo overlay, story chip) ----------
+   A real keycap: a lit top face (::after) sitting on a darker skirt (the element's own background).
+   --d is how much skirt shows under the face; pressing slides the face and the glyph down into it. */
 
 .cap {
-  --top: #fbf8f4; --wall: #ddd3c6;
-  display: inline-grid; place-items: center; flex: none;
-  height: 56px; min-width: 58px; padding: 0 18px; border-radius: 14px;
-  background: var(--top); color: var(--ink);
-  font-size: 22px; font-weight: 500; line-height: 1; letter-spacing: -0.01em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 0 var(--wall), 0 16px 26px -12px rgba(16, 16, 16, 0.45);
-  transition: transform 0.09s ease-out, box-shadow 0.09s ease-out;
+  --face-hi: #ffffff; --face-lo: #f3eee7; --wall-hi: #e9e1d6; --wall-lo: #d3c8b9;
+  --d: 7px; --press: 4px; --r: 14px;
+  position: relative; isolation: isolate; flex: none;
+  display: inline-grid; place-items: center;
+  height: 60px; min-width: 60px; padding: 0 19px var(--d); border-radius: var(--r);
+  background: linear-gradient(180deg, var(--wall-hi), var(--wall-lo));
+  color: #161412; font-size: 22px; font-weight: 500; line-height: 1; letter-spacing: -0.01em;
+  box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 4px 6px -2px rgba(16, 16, 16, 0.16), 0 16px 28px -14px rgba(16, 16, 16, 0.5);
+  transition: padding 0.08s ease-out, box-shadow 0.08s ease-out;
   user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
 }
-.cap.t { --top: var(--teal-light); --wall: var(--teal); }
-.cap.o { --top: #ffb08c; --wall: #e25f2a; }
-.cap.sp { min-width: 150px; font-size: 18px; }
-.cap.down { transform: translateY(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 1px 0 var(--wall), 0 6px 12px -8px rgba(16, 16, 16, 0.4); }
+.cap::after {
+  content: ""; position: absolute; z-index: -1;
+  inset: 1.5px 2.5px var(--d); border-radius: calc(var(--r) - 2.5px);
+  background: linear-gradient(180deg, var(--face-hi) 0%, var(--face-lo) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(16, 16, 16, 0.06), 0 1px 1.5px rgba(16, 16, 16, 0.14);
+  transition: transform 0.08s ease-out;
+}
+.cap.t { --face-hi: #a9d8d2; --face-lo: #88c3bc; --wall-hi: #2f8a86; --wall-lo: #0b5554; }
+.cap.o { --face-hi: #ffc6aa; --face-lo: #ffa880; --wall-hi: #f2834f; --wall-lo: #cf5426; }
+.cap.sp { min-width: 156px; font-size: 18px; }
+
+/* pressed: face and glyph sink into the skirt */
+.cap.down, .keys-overlay.press .cap { padding-top: calc(var(--press) * 2); box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 3px 4px -2px rgba(16, 16, 16, 0.16), 0 10px 18px -12px rgba(16, 16, 16, 0.45); }
+.cap.down::after, .keys-overlay.press .cap::after { transform: translateY(var(--press)); }
 
 .keycaps { display: flex; gap: 10px; padding: 4px 0 8px; }
 .keycaps .cap { cursor: pointer; }
 @media (max-width: 600px) {
-  .cap { height: 50px; min-width: 52px; padding: 0 15px; font-size: 20px; border-radius: 12px; }
-  .cap.sp { min-width: 124px; font-size: 16px; }
+  .cap { --d: 6px; --r: 12px; height: 52px; min-width: 52px; padding-inline: 16px; font-size: 20px; }
+  .cap.sp { min-width: 126px; font-size: 16px; }
 }
 
 /* ---------- demo cursor ---------- */
@@ -541,12 +554,12 @@ section { scroll-margin-top: 64px; }
   transform: translate(-50%, 10px); opacity: 0; transition: opacity 0.25s, transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 .sv-key.show { opacity: 1; transform: translate(-50%, 0); }
-.sv-key .cap { height: 46px; min-width: 48px; font-size: 18px; padding: 0 14px; border-radius: 12px; }
-.sv-key .cap.sp { min-width: 110px; font-size: 15px; }
+.sv-key .cap { --d: 6px; --press: 3px; --r: 12px; height: 48px; min-width: 48px; font-size: 18px; padding-inline: 14px; }
+.sv-key .cap.sp { min-width: 112px; font-size: 15px; }
 .sv-key.tap .cap { animation: cap-tap 0.5s 0.15s both; }
-@keyframes cap-tap {
-  40% { transform: translateY(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 1px 0 var(--wall), 0 6px 12px -8px rgba(16, 16, 16, 0.4); }
-}
+.sv-key.tap .cap::after { animation: face-tap 0.5s 0.15s both; }
+@keyframes cap-tap { 40% { padding-top: calc(var(--press) * 2); } }
+@keyframes face-tap { 40% { transform: translateY(var(--press)); } }
 
 .sv-cursor {
   position: absolute; left: -5px; top: -3px; width: 24px; height: 24px; z-index: 4; pointer-events: none;
@@ -647,7 +660,7 @@ section { scroll-margin-top: 64px; }
   .story-vis { height: calc(100vh - 64px - 64px); height: calc(100svh - 64px - 64px); margin-bottom: 0; }
   .sv-msg { display: none; }
   .sv-key { bottom: -14px; }
-  .sv-key .cap { height: 36px; min-width: 38px; font-size: 15px; }
+  .sv-key .cap { --d: 5px; --press: 2px; --r: 10px; height: 38px; min-width: 38px; font-size: 15px; padding-inline: 11px; }
   .sv-key .cap.sp { min-width: 84px; font-size: 13px; }
   .sv-pop { top: 50px; }
   .sv-pop-modes, .sv-pop-foot { display: none; }
@@ -691,4 +704,85 @@ section { scroll-margin-top: 64px; }
 @media (max-width: 600px) {
   .fake-plate.drag, .fake-plate.got { width: 186px; height: 100px; padding-left: 12px; }
   .drag-ghost { font-size: 12px; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* ---------- hero: the shortcut, or the plate (a tiny screen-edge scene) ---------- */
+
+/* keys on top, the scene under them at exactly the keys' width, one tidy block
+   (side by side ran into the hero picture) */
+.ways { display: grid; grid-template-columns: max-content; gap: 16px; padding: 4px 0 8px; }
+.ways .keycaps { padding: 0; }
+.ways-or { display: none; }
+
+.edge-scene {
+  --w: 100%; --h: 124px;
+  position: relative; flex: none; width: var(--w); height: var(--h); padding: 0; border: 0; cursor: pointer;
+  border-radius: 16px; overflow: hidden; font: inherit; text-align: left;
+  background-color: var(--stone);
+  background-image: radial-gradient(rgba(16, 16, 16, 0.1) 1.1px, transparent 1.3px);
+  background-size: 14px 14px;
+  box-shadow: inset 0 0 0 1px rgba(16, 16, 16, 0.06), 0 16px 30px -22px rgba(16, 16, 16, 0.45);
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.2s;
+}
+.edge-scene:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(16, 16, 16, 0.06), 0 22px 36px -22px rgba(16, 16, 16, 0.5); }
+.edge-scene:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+/* the app window, with a selected line that turns into a rewritten one */
+.es-win {
+  position: absolute; left: 62px; top: 16px; right: 14px; bottom: 16px; padding: 22px 10px 0;
+  background: #fff; border-radius: 9px; box-shadow: 0 10px 18px -12px rgba(16, 16, 16, 0.45), 0 0 0 1px rgba(16, 16, 16, 0.05);
+}
+.es-win::before { content: ""; position: absolute; left: 8px; top: 8px; width: 26px; height: 5px; background: radial-gradient(circle at 2.5px 2.5px, #ddd3c6 2.5px, transparent 3px) 0 0 / 9px 5px repeat-x; }
+.es-line { display: block; height: 5px; border-radius: 3px; background: #ece5db; margin-bottom: 7px; }
+.es-sel { width: 86%; background: #ffd2bd; }
+
+/* the plate's rail on the screen edge */
+.es-rail {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 5px 5px 4px;
+  background: #fff; border-radius: 0 12px 12px 0; box-shadow: 0 10px 22px -10px rgba(16, 16, 16, 0.5), 0 0 0 1px rgba(16, 16, 16, 0.05);
+}
+.es-rail::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2.5px; border-radius: 0 2px 2px 0; background: var(--teal); }
+.es-btn { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-soft); }
+.es-btn svg { width: 14px; height: 14px; }
+.es-main { background: var(--teal); color: #fff; }
+.es-sep { width: 14px; height: 1px; background: rgba(16, 16, 16, 0.1); margin: 1px 0; }
+.es-tip {
+  position: absolute; left: 42px; top: 20px; z-index: 2;
+  font-size: 10.5px; font-weight: 600; letter-spacing: -0.005em; color: #fff; background: var(--ink);
+  padding: 3px 7px; border-radius: 6px; white-space: nowrap; opacity: 0;
+}
+.es-cursor { position: absolute; left: 0; top: 0; width: 16px; height: 16px; z-index: 3; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)); transform: translate(118px, 84px); }
+
+/* a calm loop: pointer drifts to Rephrase, its label shows, click, the selection comes back rewritten */
+.edge-scene .es-cursor { animation: es-cursor 5.6s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
+.edge-scene .es-tip { animation: es-tip 5.6s ease infinite; }
+.edge-scene .es-main { animation: es-main 5.6s ease infinite; }
+.edge-scene .es-sel { animation: es-sel 5.6s ease infinite; }
+@keyframes es-cursor {
+  0%, 8% { transform: translate(118px, 84px); }
+  30%, 38% { transform: translate(17px, 27px) scale(1); }
+  41% { transform: translate(17px, 27px) scale(0.82); }
+  44%, 70% { transform: translate(17px, 27px) scale(1); }
+  92%, 100% { transform: translate(118px, 84px); }
+}
+@keyframes es-tip { 0%, 28% { opacity: 0; transform: translateX(-4px); } 32%, 66% { opacity: 1; transform: none; } 72%, 100% { opacity: 0; } }
+@keyframes es-main { 0%, 38% { background: var(--teal); } 41% { background: var(--teal-deep); transform: scale(0.9); } 46%, 100% { background: var(--teal); transform: none; } }
+@keyframes es-sel { 0%, 46% { background: #ffd2bd; width: 86%; } 54%, 84% { background: #bfe0dc; width: 70%; } 92%, 100% { background: #ffd2bd; width: 86%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .edge-scene .es-cursor { transform: translate(17px, 27px); }
+  .edge-scene .es-tip { opacity: 1; }
+}
+
+/* phones: the scene gets its own full-width row under the keys, so it's big enough to read */
+@media (max-width: 600px) {
+  .ways { grid-template-columns: 100%; gap: 14px; width: 100%; }
+  .edge-scene { --h: 118px; }
+  .es-win { left: 70px; right: 16px; }
+  .es-sel { width: 70%; }
+}
+@media (max-width: 380px) {
+  .ways .keycaps { gap: 8px; }
+  .ways .cap.sp { min-width: 104px; }
 }

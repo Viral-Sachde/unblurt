@@ -54,6 +54,14 @@
     }
   }
 
+  // ---------- hero plate scene: clicking it plays the plate demo further down ----------
+  document.querySelectorAll("[data-plate-demo]").forEach((b) =>
+    b.addEventListener("click", () => {
+      document.getElementById("how")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+      document.querySelector('[data-scene="3"]')?.click();
+    }),
+  );
+
   // ---------- story: the old copy/paste dance, played by scrolling ----------
   const track = document.getElementById("story-track");
   if (track) {
@@ -367,13 +375,20 @@
       }
     };
 
-    tabs.forEach((b) => b.addEventListener("click", () => run(Number(b.dataset.scene))));
+
     const startObs = new IntersectionObserver((entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         startObs.disconnect();
         run(0);
       }
     }, { threshold: 0.3 });
+    tabs.forEach((b) =>
+      b.addEventListener("click", () => {
+        // a chosen tab wins over the "start when visible" kick-off
+        startObs.disconnect();
+        run(Number(b.dataset.scene));
+      }),
+    );
     reset(SCENES[0]);
     startObs.observe(demo);
   }

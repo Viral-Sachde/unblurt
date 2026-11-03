@@ -712,7 +712,9 @@ section { scroll-margin-top: 64px; }
    (side by side ran into the hero picture) */
 .ways { display: grid; grid-template-columns: max-content; gap: 16px; padding: 4px 0 8px; }
 .ways .keycaps { padding: 0; }
-.ways-or { display: none; }
+/* "or" between the two ways in: a thin rule with the word in the middle */
+.ways-or { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; color: var(--ink-faint); line-height: 1; }
+.ways-or::before, .ways-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
 .edge-scene {
   --w: 100%; --h: 124px;

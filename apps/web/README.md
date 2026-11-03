@@ -22,8 +22,12 @@ apps/web/
 ## Run locally
 
 ```bash
-npx serve apps/web     # or just open index.html in a browser
+npx serve apps/web     # serve handles the clean URLs (/download, /privacy) like Vercel does
 ```
+
+## URLs
+
+`vercel.json` turns on clean URLs: pages live at `/`, `/download`, `/privacy` and `/terms`, and any `.html` address redirects there (`/index.html` goes to `/`). Link to the clean paths, never to `*.html`.
 
 ## Deploy
 

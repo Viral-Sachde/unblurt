@@ -555,6 +555,24 @@ section { scroll-margin-top: 64px; }
 }
 .story-vis[data-beat="6"] .sv-cursor { opacity: 0; }
 
+/* scroll hint: under the first caption, fades once the scene starts */
+.story-hint {
+  display: flex; align-items: center; gap: 12px; margin: clamp(18px, 3vh, 30px) 0 0;
+  font-size: 14px; font-weight: 500; letter-spacing: -0.005em; color: rgba(255, 255, 255, 0.6);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.story-hint i { position: relative; width: 20px; height: 30px; border: 1.5px solid rgba(255, 255, 255, 0.45); border-radius: 10px; flex: none; }
+.story-hint i::after {
+  content: ""; position: absolute; left: 50%; top: 6px; width: 3px; height: 6px; margin-left: -1.5px; border-radius: 2px;
+  background: var(--persimmon); animation: hint-wheel 1.5s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+}
+@keyframes hint-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(9px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
+.story-track.started .story-hint { opacity: 0; transform: translateY(6px); }
+@media (max-width: 860px) {
+  .story-hint { margin-top: 14px; font-size: 13.5px; }
+  .story-hint i { width: 16px; height: 24px; }
+}
+
 .story-after { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 80px); padding-block: clamp(40px, 6vw, 80px) clamp(72px, 10vw, 140px); }
 .story-body { grid-column: 2; }
 .story-side { display: flex; flex-direction: column; gap: clamp(20px, 3vw, 36px); align-self: start; position: sticky; top: 112px; }
@@ -613,3 +631,18 @@ section { scroll-margin-top: 64px; }
 .legal a { color: var(--teal); text-underline-offset: 3px; }
 .legal b { font-weight: 600; color: var(--ink); }
 
+/* short landscape phones: side by side again, sized to the screen */
+@media (max-height: 520px) and (orientation: landscape) {
+  .story-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 24px; align-items: center; }
+  .story-words { font-size: clamp(24px, 6.4vh, 32px); }
+  .story-caps { margin-top: 10px; }
+  .story-caps p { font-size: 14.5px; }
+  .story-hint { margin-top: 10px; font-size: 13px; }
+  .story-vis { height: calc(100vh - 64px - 64px); height: calc(100svh - 64px - 64px); margin-bottom: 0; }
+  .sv-msg { display: none; }
+  .sv-key { bottom: -14px; }
+  .sv-key .cap { height: 36px; min-width: 38px; font-size: 15px; }
+  .sv-key .cap.sp { min-width: 84px; font-size: 13px; }
+  .sv-pop { top: 50px; }
+  .sv-pop-modes, .sv-pop-foot { display: none; }
+}

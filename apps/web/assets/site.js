@@ -104,6 +104,7 @@
       if (b === beat) return;
       beat = b;
       vis.dataset.beat = String(b);
+      track.classList.toggle("started", b > 0);
       vis.dataset.app = APP[b];
       wordEls.forEach((w) => {
         const i = Number(w.dataset.w);

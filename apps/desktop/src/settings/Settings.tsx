@@ -214,8 +214,8 @@ export function Settings() {
           </button>
         </div>
         <p className="muted small">
-          A slim tab on the left edge of your screen. Drag selected text onto it, or click it, to open unblurt. The
-          original text stays where it is.
+          A slim tab on the left edge of your screen. Drag selected text onto it to open unblurt, or hover it for
+          Rephrase, Shorter and Clipboard. The original text stays where it is.
         </p>
       </section>
 

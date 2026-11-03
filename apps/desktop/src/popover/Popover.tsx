@@ -29,6 +29,7 @@ export function Popover() {
   const noteRef = useRef<HTMLInputElement>(null);
   const outputRef = useRef<HTMLTextAreaElement>(null);
   const runId = useRef(0);
+  const autoRun = useRef(false); // set by a plate quick action; run once the new input/mode land
 
   const current = modeById(mode);
 
@@ -39,8 +40,14 @@ export function Popover() {
 
   // Summoned by the global shortcut, with whatever text was selected in the frontmost app.
   useEffect(() => {
-    const un = listen<{ text: string }>("summon", ({ payload }) => {
+    const un = listen<{ text: string; mode?: string | null; run?: boolean }>("summon", ({ payload }) => {
       runId.current++;
+      const m = MODES.find((x) => x.id === payload.mode);
+      if (m) {
+        setMode(m.id);
+        savePrefs({ mode: m.id });
+      }
+      autoRun.current = !!payload.run && payload.text.trim().length > 0;
       setInput(payload.text);
       setNote("");
       setOutput("");
@@ -123,6 +130,14 @@ export function Popover() {
     }
   }, [input, note, mode, tone]);
 
+  // A quick action from the plate asked for the rewrite to start straight away.
+  useEffect(() => {
+    if (autoRun.current && input.trim()) {
+      autoRun.current = false;
+      run();
+    }
+  }, [run, input]);
+
   const paste = useCallback(() => {
     if (output.trim()) api.paste(output).catch((e) => (setError(errorText(e)), setPhase("error")));
   }, [output]);
@@ -188,6 +203,11 @@ export function Popover() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+              </svg>
+            </button>
+            <button className="icon-btn" onClick={() => api.hide()} title="Close · esc" aria-label="Close">
+              <svg width="13" height="13" viewBox="0 0 12 12">
+                <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
             </button>
           </div>

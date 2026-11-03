@@ -45,7 +45,7 @@ Installers only build for the OS you're on. Build on each platform, or use [`tau
 ```
 src/
 ├── popover/Popover.tsx    The window that appears on the shortcut: modes, tone, note, result
-├── plate/Plate.tsx        The drop target on the left screen edge: drag text onto it, or click it
+├── plate/Plate.tsx        The left screen edge plate: drop text on it, or hover for Rephrase, Shorter, Clipboard
 ├── settings/Settings.tsx  Engine status, model picker, shortcut, plate, default tone
 ├── lib/modes.ts           The seven modes, five tones and the prompt builder (edit prompts here)
 ├── lib/api.ts             Typed wrappers around the Tauri commands
@@ -59,9 +59,13 @@ src-tauri/src/
 └── opencode.rs   Finds opencode, runs a private `opencode serve`, creates and deletes sessions, reports status
 ```
 
-**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `suspend_hotkey` · `plate_drop` · `plate_click` · `set_plate` · `quit`
+**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `suspend_hotkey` · `plate_drop` · `plate_action` · `size_plate` · `set_plate` · `quit`
 
-**The plate** is its own window (`label: "plate"`) that is never focusable, so clicking or dropping on it leaves the app you were in frontmost. That's what lets a click grab the selection like the shortcut does, and lets paste land back in the source app. `dragDropEnabled` is off for it so the webview gets real HTML drag events with the dropped text. It is 16px wide at rest, widens on hover and to a landing pad while text is dragged over it.
+**The plate** is its own window (`label: "plate"`) that is never focusable, so clicking or dropping on it leaves the app you were in frontmost. `dragDropEnabled` is off for it so the webview gets real HTML drag events with the dropped text. It is 16px wide at rest, opens a three-button rail on hover (Rephrase, Shorter, Clipboard) and a landing pad while text is dragged over it.
+
+Two macOS details shape it:
+- A window that never takes focus gets no hover events while another app is active, so Rust watches the cursor (`plate-pointer` events) and the plate opens and highlights from that.
+- Any click still activates unblurt, so `front.rs` keeps track of the last other frontmost app. Before a quick action grabs the selection, and whenever the popover closes, focus goes back to that app. unblurt never hides itself to return focus, because that would hide the plate too.
 
 ## Engine
 

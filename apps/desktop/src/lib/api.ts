@@ -31,7 +31,8 @@ export const api = {
   /** Lets go of the global shortcut while a new one is being recorded. */
   suspendHotkey: () => invoke<void>("suspend_hotkey"),
   plateDrop: (text: string) => invoke<void>("plate_drop", { text }),
-  plateClick: () => invoke<void>("plate_click"),
+  plateAction: (mode: string | null, clipboard: boolean) => invoke<void>("plate_action", { mode, clipboard }),
+  sizePlate: (width: number, height: number) => invoke<void>("size_plate", { width, height }),
   setPlate: (visible: boolean) => invoke<void>("set_plate", { visible }),
   quit: () => invoke<void>("quit"),
 };

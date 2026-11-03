@@ -42,7 +42,7 @@
 
 **Not dictation. Not another chat tab.** It's like Wispr Flow, but text in, text out. Highlight something (or start from nothing), hit the shortcut, pick a mode and a tone, press enter. The rewrite is pasted back into the app you were in, and your clipboard is put back the way it was.
 
-**Hand on the mouse?** Drag the selected text onto the **plate**, a slim tab on the left edge of your screen. unblurt opens right beside it with that text, your original stays put, and paste replaces it when you're done. Click the plate to unblurt whatever is selected. Hide it in settings if you'd rather not see it.
+**Hand on the mouse?** Drag the selected text onto the **plate**, a slim tab on the left edge of your screen. unblurt opens right beside it with that text, your original stays put, and paste replaces it when you're done. Hover the plate for three quick buttons: **Rephrase** or **Shorter** on whatever you have selected, or **Clipboard** for what you last copied. Hide it in settings if you'd rather not see it.
 
 ## ✦ Modes
 

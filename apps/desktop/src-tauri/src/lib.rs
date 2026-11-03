@@ -1,22 +1,39 @@
+mod front;
 mod keys;
 mod opencode;
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use serde::Serialize;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
-use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, RunEvent, State, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, Emitter, LogicalSize, Manager, PhysicalPosition, RunEvent, State, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 use opencode::{Engine, Models, Status, TransformRequest};
 
 const DEFAULT_HOTKEY: &str = "CommandOrControl+Shift+Space";
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Default)]
 struct Summon {
     text: String,
+    /// Switch the popover to this mode first (quick actions on the plate).
+    mode: Option<String>,
+    /// Start the rewrite straight away instead of waiting for Enter.
+    run: bool,
 }
+
+/// Where the cursor is relative to the plate, in the plate window's own logical pixels.
+#[derive(Clone, Serialize, PartialEq)]
+struct PlatePointer {
+    inside: bool,
+    x: i32,
+    y: i32,
+}
+
+/// Whether the plate is on screen; read by the pointer watcher without touching the main thread.
+static PLATE_ON: AtomicBool = AtomicBool::new(false);
 
 fn popover(app: &AppHandle) -> Option<WebviewWindow> {
     app.get_webview_window("popover")
@@ -38,15 +55,16 @@ fn summon(app: &AppHandle) {
     // Copying the selection sleeps a little while the target app responds; keep that off the main thread.
     std::thread::spawn(move || {
         let text = keys::grab_selection().unwrap_or_default();
-        open_with(&app, text, false);
+        open_with(&app, Summon { text, ..Default::default() }, false);
     });
 }
 
 /// Shows the popover filled with `text`: top-center of the active screen, or beside the plate
 /// when the text was dropped on it.
-fn open_with(app: &AppHandle, text: String, beside_plate: bool) {
+fn open_with(app: &AppHandle, summon: Summon, beside_plate: bool) {
     let Some(win) = popover(app) else { return };
-    let _ = app.emit_to("popover", "summon", Summon { text });
+    front::remember();
+    let _ = app.emit_to("popover", "summon", summon);
     let handle = app.clone();
     let _ = app.run_on_main_thread(move || {
         if !(beside_plate && place_beside_plate(&handle, &win)) {
@@ -65,6 +83,40 @@ fn place_plate(app: &AppHandle) {
     let area = m.work_area();
     let y = area.position.y + (area.size.height as i32 - size.height as i32) / 2;
     let _ = win.set_position(PhysicalPosition::new(area.position.x, y));
+}
+
+/// The plate's window never becomes key, so macOS doesn't send it hover events while another app
+/// is active. Instead, watch the cursor and tell the plate where it is.
+fn watch_plate_pointer(app: AppHandle) {
+    std::thread::spawn(move || {
+        let mut last: Option<PlatePointer> = None;
+        loop {
+            std::thread::sleep(Duration::from_millis(40));
+            if !PLATE_ON.load(Ordering::Relaxed) {
+                last = None;
+                continue;
+            }
+            // keep note of the app you're working in, before a click on the plate activates us
+            front::track();
+            let Some(win) = plate(&app) else { continue };
+            let (Ok(c), Ok(pos), Ok(size), Ok(scale)) =
+                (app.cursor_position(), win.outer_position(), win.outer_size(), win.scale_factor())
+            else {
+                continue;
+            };
+            let (dx, dy) = (c.x - pos.x as f64, c.y - pos.y as f64);
+            let inside = dx >= 0.0 && dy >= 0.0 && dx < size.width as f64 && dy < size.height as f64;
+            let now = if inside {
+                PlatePointer { inside, x: (dx / scale) as i32, y: (dy / scale) as i32 }
+            } else {
+                PlatePointer { inside, x: 0, y: 0 }
+            };
+            if last.as_ref() != Some(&now) {
+                let _ = app.emit_to("plate", "plate-pointer", now.clone());
+                last = Some(now);
+            }
+        }
+    });
 }
 
 /// Opens the popover just right of the plate, centred on it, kept on screen.
@@ -104,10 +156,11 @@ fn hide_and_return_focus(app: &AppHandle) {
     if let Some(win) = popover(app) {
         let _ = win.hide();
     }
-    // Hiding a window on macOS doesn't reactivate the previous app; hiding the app does.
+    // Hiding a window on macOS doesn't reactivate the previous app, so bring it back ourselves.
+    // (Never hide the whole app for this: it would take the plate down with it.)
     #[cfg(target_os = "macos")]
     if !app.get_webview_window("settings").and_then(|w| w.is_visible().ok()).unwrap_or(false) {
-        let _ = app.hide();
+        front::restore(app);
     }
 }
 
@@ -187,20 +240,43 @@ fn set_hotkey(app: AppHandle, accelerator: String) -> Result<(), String> {
 #[tauri::command]
 fn plate_drop(app: AppHandle, text: String) {
     if !text.trim().is_empty() {
-        open_with(&app, text, true);
+        open_with(&app, Summon { text, ..Default::default() }, true);
     }
 }
 
-/// The plate was clicked. It never takes focus, so the app the user was in is still frontmost
-/// and its selection can be grabbed exactly like the hotkey does.
+/// A quick action from the plate's menu. Uses the selection in the app you're in (the plate never
+/// takes focus, so it's still frontmost), or the clipboard. With a mode on a selection, the rewrite
+/// starts right away.
 #[tauri::command]
-fn plate_click(app: AppHandle) {
-    summon(&app);
+fn plate_action(app: AppHandle, mode: Option<String>, clipboard: bool) {
+    std::thread::spawn(move || {
+        let text = if clipboard {
+            keys::clipboard_text()
+        } else {
+            // The click on the plate activated unblurt. Hand focus back to the app with the
+            // selection first, or the simulated ⌘C would land in unblurt instead.
+            front::restore(&app);
+            std::thread::sleep(Duration::from_millis(320));
+            keys::grab_selection().unwrap_or_default()
+        };
+        let run = !text.trim().is_empty() && mode.as_deref().is_some_and(|m| m != "ask");
+        open_with(&app, Summon { text, mode, run }, true);
+    });
+}
+
+/// Resizes the plate and re-pins it to the left edge, centred, so it grows and shrinks in place
+/// whatever order the startup placement and the first resize arrive in.
+#[tauri::command]
+fn size_plate(app: AppHandle, width: f64, height: f64) {
+    let Some(win) = plate(&app) else { return };
+    let _ = win.set_size(LogicalSize::new(width, height));
+    place_plate(&app);
 }
 
 #[tauri::command]
 fn set_plate(app: AppHandle, visible: bool) {
     let Some(win) = plate(&app) else { return };
+    PLATE_ON.store(visible, Ordering::Relaxed);
     if visible {
         place_plate(&app);
         let _ = win.show();
@@ -245,7 +321,8 @@ pub fn run() {
             set_hotkey,
             suspend_hotkey,
             plate_drop,
-            plate_click,
+            plate_action,
+            size_plate,
             set_plate,
             quit
         ])
@@ -264,6 +341,7 @@ pub fn run() {
             });
 
             app.global_shortcut().register(DEFAULT_HOTKEY)?;
+            watch_plate_pointer(app.handle().clone());
 
             if let Some(win) = popover(app.handle()) {
                 let w = win.clone();

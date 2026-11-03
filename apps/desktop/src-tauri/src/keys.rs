@@ -75,6 +75,11 @@ pub fn grab_selection() -> Result<String, String> {
     Ok(grabbed)
 }
 
+/// Whatever text is on the clipboard right now ("" if none).
+pub fn clipboard_text() -> String {
+    clipboard().ok().and_then(|c| c.lock().ok().and_then(|mut cb| cb.get_text().ok())).unwrap_or_default()
+}
+
 /// Puts `text` on the clipboard and pastes it into whatever app has focus.
 /// The result stays on the clipboard so it can be pasted again.
 pub fn paste(text: &str) -> Result<(), String> {

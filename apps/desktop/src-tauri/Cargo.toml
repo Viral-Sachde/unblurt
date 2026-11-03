@@ -21,3 +21,8 @@ reqwest = { version = "0.12", default-features = false, features = ["json"] }
 tokio = { version = "1", features = ["process", "time", "sync", "macros"] }
 arboard = "3"
 enigo = "0.6"
+
+# Remember and re-activate the app you came from, without hiding unblurt's other windows (the plate).
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "libc", "NSApplication", "NSResponder", "NSWorkspace", "NSRunningApplication"] }

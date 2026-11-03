@@ -803,3 +803,9 @@ section { scroll-margin-top: 64px; }
 /* step 01's sample sentence: wraps inside its box instead of running off the edges */
 .step-sample { padding: 0 20px; text-align: center; font-size: 16.5px; line-height: 1.6; letter-spacing: -0.01em; max-width: 26ch; }
 .step-sample mark { background: #ffd7c4; color: inherit; padding: 2px 1px; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+/* footer sign-off */
+.footer .brewed { display: block; line-height: 1.5; }
+.footer .brewed > span { margin-right: 2px; }
+.footer .brewed a { white-space: nowrap; color: var(--ink); font-weight: 550; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; min-height: 0; display: inline; }
+.footer .brewed a:hover { text-decoration-color: currentColor; }

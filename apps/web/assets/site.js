@@ -156,7 +156,7 @@
     const el = {
       where: $("where"), thread: $("thread"), composer: $("composer"), keys: $("keys"), pop: $("pop"),
       tone: $("tone"), modes: $("modes"), input: $("input"), note: $("note"), output: $("output"), go: $("go"),
-      cursor: $("cursor"), app: demo.querySelector(".fake-app"),
+      cursor: $("cursor"), app: demo.querySelector(".fake-app"), plate: $("plate"), ghost: $("ghost"),
     };
     const tabs = [...demo.querySelectorAll("[data-scene]")];
 
@@ -183,6 +183,14 @@
         messy: "Hey! Any chance you could send the Q3 numbers before Friday's board prep?",
         mode: "Reply", tone: "warm", note: "yes but only thursday evening",
         result: "Happy to! I'll have the Q3 numbers over to you Thursday evening, so they're ready in time for Friday's prep.",
+      },
+      {
+        where: "Q3 update",
+        thread: [],
+        messy: "so basically what im trying to say is the billing timeline doesnt really work and we need like more time to do it properly",
+        mode: "Rephrase", tone: "neutral", note: "",
+        plate: true,
+        result: "The billing timeline doesn't work for us as it stands. We need more time to do it properly.",
       },
     ];
 
@@ -259,6 +267,9 @@
         el.thread.append(b);
       }
       el.composer.className = "composer";
+      demo.classList.toggle("with-plate", !!s.plate);
+      el.plate.className = "fake-plate";
+      el.ghost.classList.remove("show");
       el.composer.innerHTML = '<span class="caret"></span>';
       el.pop.className = "pop";
       el.go.textContent = "unblurt ↵";
@@ -285,12 +296,31 @@
         el.composer.append(host);
         await dragSelect(host, s.messy, t);
       }
-      await wait(500, t);
-      el.keys.classList.add("show");
-      await wait(300, t);
-      await press(el.keys, t);
-      await wait(250, t);
-      el.keys.classList.remove("show");
+      if (s.plate) {
+        // grab the selection and drag it onto the plate at the screen edge
+        const sel = (s.selectThread ? el.thread : el.composer).querySelector(".sel");
+        await moveTo(at(sel, 0.35, 0.5), 450, t);
+        await wait(200, t);
+        el.ghost.textContent = s.messy.length > 34 ? `${s.messy.slice(0, 34).trim()}…` : s.messy;
+        el.ghost.classList.add("show");
+        const [px, py] = at(el.plate, 0.5, 0.5);
+        await moveTo([px + 120, py], 900, t);
+        el.plate.classList.add("drag");
+        await wait(250, t);
+        await moveTo(at(el.plate, 0.62, 0.5), 450, t);
+        await wait(450, t);
+        el.ghost.classList.remove("show");
+        el.plate.classList.replace("drag", "got");
+        await wait(550, t);
+        el.plate.classList.remove("got");
+      } else {
+        await wait(500, t);
+        el.keys.classList.add("show");
+        await wait(300, t);
+        await press(el.keys, t);
+        await wait(250, t);
+        el.keys.classList.remove("show");
+      }
 
       el.input.textContent = s.messy;
       el.pop.classList.add("show");

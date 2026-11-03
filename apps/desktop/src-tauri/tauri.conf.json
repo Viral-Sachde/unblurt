@@ -28,6 +28,24 @@
         "visibleOnAllWorkspaces": true
       },
       {
+        "label": "plate",
+        "title": "unblurt plate",
+        "width": 16,
+        "height": 176,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false,
+        "focusable": false,
+        "focus": false,
+        "acceptFirstMouse": true,
+        "dragDropEnabled": false,
+        "visibleOnAllWorkspaces": true
+      },
+      {
         "label": "settings",
         "title": "unblurt",
         "width": 540,

@@ -144,6 +144,7 @@
           <button role="tab" aria-selected="true" data-scene="0">A message</button>
           <button role="tab" aria-selected="false" data-scene="1">An email</button>
           <button role="tab" aria-selected="false" data-scene="2">A reply</button>
+          <button role="tab" aria-selected="false" data-scene="3">Drag to the plate</button>
         </div>
         <div class="fake-app" aria-live="off">
           <div class="fake-bar"><i></i><i></i><i></i><span data-demo="where">#launch-crew</span></div>
@@ -171,7 +172,12 @@
             </div>
           </div>
         </div>
+        <div class="fake-plate" data-demo="plate" aria-hidden="true">
+          <img src="assets/mark.svg" alt="" />
+          <span><b>drop to unblurt</b><small>your original stays put</small></span>
+        </div>
         <div class="cursor" data-demo="cursor" aria-hidden="true">
+          <span class="drag-ghost" data-demo="ghost"></span>
           <svg class="arrow" viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.3 1.4-3.4 5.9z" fill="#101010" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" /></svg>
           <svg class="ibeam" viewBox="0 0 24 24"><path d="M9 3.5h2.2c.5 0 .8.3.8.8v15.4c0 .5-.3.8-.8.8H9M15 3.5h-2.2c-.5 0-.8.3-.8.8M15 20.5h-2.2c-.5 0-.8-.3-.8-.8M10 12h4" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" /><path d="M9 3.5h2.2c.5 0 .8.3.8.8v15.4c0 .5-.3.8-.8.8H9M15 3.5h-2.2c-.5 0-.8.3-.8.8M15 20.5h-2.2c-.5 0-.8-.3-.8-.8M10 12h4" fill="none" stroke="#101010" stroke-width="1.5" stroke-linecap="round" /></svg>
         </div>
@@ -284,7 +290,7 @@
           <div class="art-mini"><span style="display: flex; gap: 6px"><kbd data-mod>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></span></div>
           <span class="num">02</span>
           <h3>Press.</h3>
-          <p>A small window pops up right where you're looking. Pick a mode, add a note if you want.</p>
+          <p>A small window pops up right where you're looking. Pick a mode, add a note if you want. Prefer the mouse? Drag the text onto the plate on the left edge of your screen.</p>
         </div>
         <div class="step reveal">
           <div class="art-mini"><span style="display: flex; gap: 6px"><kbd>↵</kbd></span></div>

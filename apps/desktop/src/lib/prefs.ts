@@ -6,6 +6,8 @@ export interface Prefs {
   tone: Tone;
   model: ModelRef | null;
   hotkey: string;
+  /** The drop target on the left edge of the screen. */
+  plate: boolean;
 }
 
 export const isMac = navigator.userAgent.includes("Mac");
@@ -18,7 +20,7 @@ export const HOTKEYS = [
 ];
 
 const KEY = "unblurt.prefs";
-const DEFAULTS: Prefs = { mode: "rephrase", tone: "neutral", model: null, hotkey: HOTKEYS[0].accel };
+const DEFAULTS: Prefs = { mode: "rephrase", tone: "neutral", model: null, hotkey: HOTKEYS[0].accel, plate: true };
 
 // localStorage is shared by the popover and settings windows (same origin),
 // and the `storage` event keeps them in sync.

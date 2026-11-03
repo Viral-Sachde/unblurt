@@ -22,7 +22,12 @@ fn popover(app: &AppHandle) -> Option<WebviewWindow> {
     app.get_webview_window("popover")
 }
 
-/// Hotkey pressed: grab the selection from the app the user is in, then show the popover over it.
+fn plate(app: &AppHandle) -> Option<WebviewWindow> {
+    app.get_webview_window("plate")
+}
+
+/// Hotkey pressed (or the plate clicked): grab the selection from the app the user is in,
+/// then show the popover over it.
 fn summon(app: &AppHandle) {
     let Some(win) = popover(app) else { return };
     if win.is_visible().unwrap_or(false) {
@@ -33,14 +38,51 @@ fn summon(app: &AppHandle) {
     // Copying the selection sleeps a little while the target app responds; keep that off the main thread.
     std::thread::spawn(move || {
         let text = keys::grab_selection().unwrap_or_default();
-        let _ = app.emit_to("popover", "summon", Summon { text });
-        let handle = app.clone();
-        let _ = app.run_on_main_thread(move || {
-            place_on_active_screen(&handle, &win);
-            let _ = win.show();
-            let _ = win.set_focus();
-        });
+        open_with(&app, text, false);
     });
+}
+
+/// Shows the popover filled with `text`: top-center of the active screen, or beside the plate
+/// when the text was dropped on it.
+fn open_with(app: &AppHandle, text: String, beside_plate: bool) {
+    let Some(win) = popover(app) else { return };
+    let _ = app.emit_to("popover", "summon", Summon { text });
+    let handle = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        if !(beside_plate && place_beside_plate(&handle, &win)) {
+            place_on_active_screen(&handle, &win);
+        }
+        let _ = win.show();
+        let _ = win.set_focus();
+    });
+}
+
+/// The plate hugs the left edge of the main screen, vertically centred in the usable area.
+fn place_plate(app: &AppHandle) {
+    let Some(win) = plate(app) else { return };
+    let monitor = app.primary_monitor().ok().flatten().or_else(|| win.current_monitor().ok().flatten());
+    let (Some(m), Ok(size)) = (monitor, win.outer_size()) else { return };
+    let area = m.work_area();
+    let y = area.position.y + (area.size.height as i32 - size.height as i32) / 2;
+    let _ = win.set_position(PhysicalPosition::new(area.position.x, y));
+}
+
+/// Opens the popover just right of the plate, centred on it, kept on screen.
+fn place_beside_plate(app: &AppHandle, win: &WebviewWindow) -> bool {
+    let Some(p) = plate(app) else { return false };
+    let (Ok(pp), Ok(ps), Ok(size), Some(m)) = (p.outer_position(), p.outer_size(), win.outer_size(), p.current_monitor().ok().flatten())
+    else {
+        return false;
+    };
+    let area = m.work_area();
+    let scale = m.scale_factor();
+    let x = area.position.x + (24.0 * scale) as i32;
+    let centre = pp.y + ps.height as i32 / 2;
+    let top = area.position.y;
+    let bottom = area.position.y + area.size.height as i32 - size.height as i32;
+    let y = (centre - size.height as i32 / 2).clamp(top, bottom.max(top));
+    let _ = win.set_position(PhysicalPosition::new(x, y));
+    true
 }
 
 /// Top-center of whichever screen the cursor is on, where the eye already is.
@@ -141,6 +183,32 @@ fn set_hotkey(app: AppHandle, accelerator: String) -> Result<(), String> {
     Ok(())
 }
 
+/// Text was dragged out of another app and dropped on the plate.
+#[tauri::command]
+fn plate_drop(app: AppHandle, text: String) {
+    if !text.trim().is_empty() {
+        open_with(&app, text, true);
+    }
+}
+
+/// The plate was clicked. It never takes focus, so the app the user was in is still frontmost
+/// and its selection can be grabbed exactly like the hotkey does.
+#[tauri::command]
+fn plate_click(app: AppHandle) {
+    summon(&app);
+}
+
+#[tauri::command]
+fn set_plate(app: AppHandle, visible: bool) {
+    let Some(win) = plate(&app) else { return };
+    if visible {
+        place_plate(&app);
+        let _ = win.show();
+    } else {
+        let _ = win.hide();
+    }
+}
+
 #[tauri::command]
 fn quit(app: AppHandle) {
     app.exit(0);
@@ -168,6 +236,9 @@ pub fn run() {
             hide_popover,
             open_settings,
             set_hotkey,
+            plate_drop,
+            plate_click,
+            set_plate,
             quit
         ])
         .setup(|app| {

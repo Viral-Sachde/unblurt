@@ -187,3 +187,49 @@ html[data-window="settings"] body { background: var(--stone-soft); }
 .warn { color: var(--persimmon); }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-faint); word-break: break-all; }
 .settings-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
+
+/* ---------- plate (left screen edge drop target) ---------- */
+
+html[data-window="plate"], html[data-window="plate"] body { background: transparent; overflow: hidden; user-select: none; -webkit-user-select: none; }
+
+.plate-stage { height: 100%; display: flex; align-items: center; cursor: default; }
+
+.plate {
+  position: relative;
+  display: flex; align-items: center; gap: 12px; overflow: hidden;
+  height: 64px; width: 6px; padding-left: 0;
+  border-radius: 0 10px 10px 0;
+  background: var(--teal);
+  box-shadow: 0 6px 18px -6px rgba(16, 16, 16, 0.35);
+  transition: width 200ms cubic-bezier(0.2, 0.9, 0.3, 1.1), height 200ms cubic-bezier(0.2, 0.9, 0.3, 1.1),
+    background 160ms, border-radius 200ms, padding 200ms;
+}
+.plate-mark { flex: none; width: 22px; height: 22px; display: grid; place-items: center; opacity: 0; transition: opacity 120ms; }
+.plate-copy { display: flex; flex-direction: column; gap: 1px; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity 140ms, transform 200ms; }
+.plate-copy b { font-size: 14px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+.plate-copy small { font-size: 11.5px; color: var(--ink-soft); }
+
+/* hover: a small tab showing the mark, click to unblurt the current selection */
+.s-hover .plate { width: 44px; height: 64px; padding-left: 11px; background: var(--surface); box-shadow: var(--shadow); }
+.s-hover .plate-mark { opacity: 1; }
+
+/* dragging text over it: a proper landing pad */
+.s-drag .plate, .s-got .plate {
+  width: 224px; height: 132px; padding-left: 18px; border-radius: 0 18px 18px 0;
+  background: var(--surface); box-shadow: var(--shadow);
+}
+.s-drag .plate::after {
+  content: ""; position: absolute; inset: 8px 8px 8px 0; border-radius: 0 12px 12px 0;
+  border: 1.5px dashed var(--persimmon); border-left: 0; pointer-events: none;
+  animation: plate-breathe 1.1s ease-in-out infinite alternate;
+}
+@keyframes plate-breathe { from { opacity: 0.45; } to { opacity: 1; } }
+.s-drag .plate-mark, .s-got .plate-mark { opacity: 1; transform: scale(1.15); }
+.s-drag .plate-copy, .s-got .plate-copy { opacity: 1; transform: none; transition-delay: 60ms; }
+.s-got .plate { background: var(--teal-tint); }
+.s-got .plate-copy b { color: var(--teal); }
+
+@media (prefers-reduced-motion: reduce) {
+  .plate, .plate-copy, .plate-mark { transition: none; }
+  .s-drag .plate::after { animation: none; }
+}

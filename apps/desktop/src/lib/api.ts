@@ -28,6 +28,9 @@ export const api = {
   status: () => invoke<EngineStatus>("engine_status"),
   restartEngine: () => invoke<EngineStatus>("restart_engine"),
   setHotkey: (accelerator: string) => invoke<void>("set_hotkey", { accelerator }),
+  plateDrop: (text: string) => invoke<void>("plate_drop", { text }),
+  plateClick: () => invoke<void>("plate_click"),
+  setPlate: (visible: boolean) => invoke<void>("set_plate", { visible }),
   quit: () => invoke<void>("quit"),
 };
 

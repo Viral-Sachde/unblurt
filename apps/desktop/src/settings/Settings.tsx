@@ -33,7 +33,12 @@ export function Settings() {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
-  const update = (patch: Partial<Prefs>) => setPrefs(savePrefs(patch));
+  const update = (patch: Partial<Prefs>) => {
+    const next = savePrefs(patch);
+    setPrefs(next);
+    // the storage event doesn't fire in the window that wrote it, so tell the app directly
+    if ("plate" in patch) api.setPlate(next.plate).catch(() => {});
+  };
 
   const chooseHotkey = async (accel: string) => {
     setHotkeyError("");
@@ -127,6 +132,22 @@ export function Settings() {
         </div>
         {hotkeyError && <p className="warn small">{hotkeyError}</p>}
         <p className="muted small">Select text anywhere, press it, hit enter. That's the whole trick.</p>
+      </section>
+
+      <section className="panel">
+        <h2>Plate</h2>
+        <div className="segmented">
+          <button className={prefs.plate ? "on" : ""} onClick={() => update({ plate: true })}>
+            show
+          </button>
+          <button className={!prefs.plate ? "on" : ""} onClick={() => update({ plate: false })}>
+            hide
+          </button>
+        </div>
+        <p className="muted small">
+          A slim tab on the left edge of your screen. Drag selected text onto it, or click it, to open unblurt. The
+          original text stays where it is.
+        </p>
       </section>
 
       <section className="panel">

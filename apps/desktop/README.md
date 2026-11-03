@@ -45,7 +45,8 @@ Installers only build for the OS you're on. Build on each platform, or use [`tau
 ```
 src/
 ├── popover/Popover.tsx    The window that appears on the shortcut: modes, tone, note, result
-├── settings/Settings.tsx  Engine status, model picker, shortcut, default tone
+├── plate/Plate.tsx        The drop target on the left screen edge: drag text onto it, or click it
+├── settings/Settings.tsx  Engine status, model picker, shortcut, plate, default tone
 ├── lib/modes.ts           The seven modes, five tones and the prompt builder (edit prompts here)
 ├── lib/api.ts             Typed wrappers around the Tauri commands
 ├── lib/prefs.ts           Local preferences
@@ -57,7 +58,9 @@ src-tauri/src/
 └── opencode.rs   Finds opencode, runs a private `opencode serve`, creates and deletes sessions, reports status
 ```
 
-**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `quit`
+**Tauri commands:** `transform` · `list_models` · `engine_status` · `restart_engine` · `paste_text` · `copy_text` · `hide_popover` · `open_settings` · `set_hotkey` · `plate_drop` · `plate_click` · `set_plate` · `quit`
+
+**The plate** is its own window (`label: "plate"`) that is never focusable, so clicking or dropping on it leaves the app you were in frontmost. That's what lets a click grab the selection like the shortcut does, and lets paste land back in the source app. `dragDropEnabled` is off for it so the webview gets real HTML drag events with the dropped text. It is 16px wide at rest, widens on hover and to a landing pad while text is dragged over it.
 
 ## Engine
 

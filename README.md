@@ -42,6 +42,8 @@
 
 **Not dictation. Not another chat tab.** It's like Wispr Flow, but text in, text out. Highlight something (or start from nothing), hit the shortcut, pick a mode and a tone, press enter. The rewrite is pasted back into the app you were in, and your clipboard is put back the way it was.
 
+**Hand on the mouse?** Drag the selected text onto the **plate**, a slim tab on the left edge of your screen. unblurt opens right beside it with that text, your original stays put, and paste replaces it when you're done. Click the plate to unblurt whatever is selected. Hide it in settings if you'd rather not see it.
+
 ## ✦ Modes
 
 | Key | Mode | What it does | Before → after |
@@ -158,6 +160,7 @@ Petrol teal `#0F6B6A` · persimmon `#FF7A45` · warm stone `#EDE6DD` · ink `#10
 
 - [ ] Clipboard restore keeps text only. An image on the clipboard is lost after a selection grab.
 - [ ] Wayland blocks simulated keystrokes in many compositors, so you may have to paste manually on Linux.
+- [ ] The plate sits on the main display only.
 - [ ] Rewrites aren't streamed yet. The popover shows a working state until the full answer arrives.
 
 ---

@@ -36,6 +36,11 @@
     <section class="hero wrap">
       <div class="hero-copy reveal">
         <h1 class="display">your brain,<br />unfiltered.</h1>
+        <div class="keycaps" role="img" aria-label="The shortcut: Command, Shift, Space">
+          <span class="cap t" data-cap="mod"><span data-mod>⌘</span></span>
+          <span class="cap o" data-cap="shift">⇧</span>
+          <span class="cap sp" data-cap="space">space</span>
+        </div>
         <p class="lede">Select text anywhere. Press one shortcut. Get it back written properly: rephrased, drafted, replied to.</p>
         <div class="row">
           <a class="btn primary" href="download.html" data-os-cta>Download</a>
@@ -55,25 +60,77 @@
     <section class="section wrap">
       <p class="statement reveal">
         <em>Not dictation. Not another chat tab.</em>
-        A tiny window for every small writing job you used to <mark>copy, paste, prompt, copy, paste</mark> for.
+        A tiny window that fixes your writing <mark>right where you typed it.</mark>
       </p>
     </section>
 
-    <!-- Story -->
-    <section class="section wrap story" id="story">
-      <div class="story-head reveal">
-        <h2 class="h2">copy, paste,<br />prompt, copy,<br />paste.</h2>
+    <!-- Story: a sticky scene that plays the old copy/paste dance as you scroll -->
+    <section class="story" id="story">
+      <div class="story-track" id="story-track">
+        <div class="story-stage">
+          <div class="wrap story-grid">
+            <div class="story-copy">
+              <h2 class="h2 story-words" aria-label="copy, paste, prompt, copy, paste.">
+                <span data-w="1">copy,</span> <span data-w="2">paste,</span><br /><span data-w="3">prompt,</span> <span data-w="4">copy,</span><br /><span data-w="5">paste.</span>
+              </h2>
+              <div class="story-caps">
+                <p data-c="0" class="on">I kept doing the same little dance.</p>
+                <p data-c="1">Type something messy in Slack. Copy it.</p>
+                <p data-c="2">Open ChatGPT. Paste it in.</p>
+                <p data-c="3">Add "make this sound normal". Send.</p>
+                <p data-c="4">Copy the answer.</p>
+                <p data-c="5">Switch back. Paste. Ten times a day.</p>
+                <p data-c="6">Now it's one shortcut, right where you typed.</p>
+              </div>
+            </div>
+
+            <div class="story-vis" id="story-vis" data-beat="0" data-app="slack" aria-hidden="true">
+              <div class="sv-win">
+                <div class="sv-bar"><i></i><i></i><i></i><span class="sv-tab" data-tab="slack"># launch-crew</span><span class="sv-tab" data-tab="chat">New chat</span></div>
+                <div class="sv-pane sv-slack">
+                  <div class="sv-msg"><b class="sv-av"></b><div><b>Priya</b><p>Are we still good to ship Thursday?</p></div></div>
+                  <div class="sv-composer">
+                    <div class="sv-messy"><span class="sv-t">ok so basically thursday prob doesnt work bc of the qa stuff, maybe monday??</span></div>
+                    <div class="sv-clean">Thursday probably won't work because of the QA blockers. Monday looks more realistic.</div>
+                  </div>
+                </div>
+                <div class="sv-pane sv-chat">
+                  <p class="sv-empty">Ask anything</p>
+                  <div class="sv-thread">
+                    <div class="sv-user"><span>ok so basically thursday prob doesnt work bc of the qa stuff, maybe monday??</span><b>make this sound normal</b></div>
+                    <div class="sv-bot"><small>Sure! Here's a clearer version:</small><span class="sv-answer"><span class="sv-t">Thursday probably won't work because of the QA blockers. Monday looks more realistic.</span></span></div>
+                  </div>
+                  <div class="sv-input">
+                    <div class="sv-field"><span class="sv-pasted">ok so basically thursday prob doesnt work bc of the qa stuff, maybe monday??</span><span class="sv-prompt">make this sound normal</span></div>
+                    <i class="sv-send"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" /></svg></i>
+                  </div>
+                </div>
+                <div class="sv-pop">
+                  <div class="sv-pop-bar"><span><img src="assets/mark.svg" alt="" />unblurt</span><em>casual</em></div>
+                  <div class="sv-pop-modes"><span>Rephrase</span><span>Email</span><span class="on">Message</span><span>Reply</span></div>
+                  <div class="sv-pop-out">Thursday probably won't work because of the QA blockers. Monday looks more realistic.</div>
+                  <div class="sv-pop-foot"><b>paste ↵</b></div>
+                </div>
+              </div>
+              <div class="sv-key" id="sv-key"></div>
+              <svg class="sv-cursor" id="sv-cursor" viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.3 1.4-3.4 5.9z" fill="#101010" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" /></svg>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="story-body reveal">
-        <p>I kept doing the same little dance. Type something messy in Slack, copy it, open ChatGPT, write "make this sound normal", copy the answer, switch back, paste. Ten times a day, for messages that took thirty seconds to think of.</p>
-        <p>Voice tools like Wispr Flow fixed this for speaking. I wanted the same thing for typing: no new tab, no prompt to write, no account to make. Select, press a shortcut, get it back sorted.</p>
-        <p>So I built unblurt. It runs on the model you already use, on your own machine, and gets out of the way. It's open source and still early, so if something feels off, tell me on GitHub.</p>
-        <p class="byline"><a href="https://www.linkedin.com/in/viral-sachde-18664b24b/" target="_blank" rel="noopener"><b>Viral Sachde</b></a><small>made unblurt</small></p>
+
+      <div class="wrap story-after">
+        <div class="story-body reveal">
+          <p>I did that dance ten times a day, for messages that took thirty seconds to think of.</p>
+          <p>Voice tools like Wispr Flow fixed this for speaking. I wanted the same thing for typing: no new tab, no prompt to write, no account to make. Select, press a shortcut, get it back sorted.</p>
+          <p>So I built unblurt. It runs on the model you already use, on your own machine, and gets out of the way. It's open source and still early, so if something feels off, tell me on GitHub.</p>
+          <p class="byline"><a href="https://www.linkedin.com/in/viral-sachde-18664b24b/" target="_blank" rel="noopener"><b>Viral Sachde</b></a><small>made unblurt</small></p>
+        </div>
       </div>
     </section>
 
     <!-- Live demo -->
-    <section class="section wrap" id="how" style="padding-top: 0">
+    <section class="section wrap" id="how">
       <div class="section-head reveal">
         <h2 class="h2">Three keys.<br />Zero tabs.</h2>
         <span class="label">How it works</span>
@@ -89,7 +146,7 @@
           <div class="fake-thread" data-demo="thread"></div>
           <div class="composer" data-demo="composer"></div>
 
-          <div class="keys-overlay" data-demo="keys"><kbd data-mod>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></div>
+          <div class="keys-overlay" data-demo="keys"><span class="cap t"><span data-mod>⌘</span></span><span class="cap o">⇧</span><span class="cap sp">space</span></div>
 
           <div class="pop" data-demo="pop" aria-hidden="true">
             <div class="pop-bar">
@@ -109,6 +166,10 @@
               <span class="act"><b class="ghost is-result">copy</b><b data-demo="go">unblurt ↵</b></span>
             </div>
           </div>
+        </div>
+        <div class="cursor" data-demo="cursor" aria-hidden="true">
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.3 1.4-3.4 5.9z" fill="#101010" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <svg class="ibeam" viewBox="0 0 24 24"><path d="M9 3.5h2.2c.5 0 .8.3.8.8v15.4c0 .5-.3.8-.8.8H9M15 3.5h-2.2c-.5 0-.8.3-.8.8M15 20.5h-2.2c-.5 0-.8-.3-.8-.8M10 12h4" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" /><path d="M9 3.5h2.2c.5 0 .8.3.8.8v15.4c0 .5-.3.8-.8.8H9M15 3.5h-2.2c-.5 0-.8.3-.8.8M15 20.5h-2.2c-.5 0-.8-.3-.8-.8M10 12h4" fill="none" stroke="#101010" stroke-width="1.5" stroke-linecap="round" /></svg>
         </div>
       </div>
     </section>
@@ -275,6 +336,8 @@
         <a href="download.html">Download</a>
         <a href="download.html#faq">FAQ</a>
         <a href="https://github.com/Viral-Sachde/unblurt" target="_blank" rel="noopener">GitHub</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
       </nav>
       <span>made by <a href="https://www.linkedin.com/in/viral-sachde-18664b24b/" target="_blank" rel="noopener">Viral Sachde</a> · messy thoughts. clear writing.</span>
     </div>

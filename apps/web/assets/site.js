@@ -20,6 +20,125 @@
   );
   document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 
+  // ---------- progressive blur along the bottom edge (hidden once you reach the end) ----------
+  const edge = document.createElement("div");
+  edge.className = "edge-blur";
+  edge.setAttribute("aria-hidden", "true");
+  edge.innerHTML = "<i></i><i></i><i></i><i></i><i></i>";
+  document.body.append(edge);
+  const edgeCheck = () => {
+    const end = document.documentElement.scrollHeight - innerHeight - 8;
+    edge.classList.toggle("off", scrollY >= end);
+  };
+  addEventListener("scroll", edgeCheck, { passive: true });
+  addEventListener("resize", edgeCheck);
+  edgeCheck();
+
+  // ---------- hero keycaps: press on tap, and mirror the real keyboard ----------
+  const capsRow = document.querySelector(".keycaps");
+  if (capsRow) {
+    const cap = (k) => capsRow.querySelector(`[data-cap="${k}"]`);
+    const set = (k, on) => cap(k)?.classList.toggle("down", on);
+    const keyOf = (e) => (e.key === "Meta" || e.key === "Control" ? "mod" : e.key === "Shift" ? "shift" : e.key === " " ? "space" : null);
+    addEventListener("keydown", (e) => { const k = keyOf(e); if (k) set(k, true); });
+    addEventListener("keyup", (e) => { const k = keyOf(e); if (k) set(k, false); });
+    addEventListener("blur", () => ["mod", "shift", "space"].forEach((k) => set(k, false)));
+    capsRow.querySelectorAll(".cap").forEach((c) => {
+      c.addEventListener("pointerdown", () => c.classList.add("down"));
+      ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => c.addEventListener(ev, () => c.classList.remove("down")));
+    });
+    if (!reduced) {
+      // play the shortcut once, shortly after load
+      const seq = [["mod", 900, true], ["shift", 1060, true], ["space", 1220, true], ["space", 1520, false], ["shift", 1580, false], ["mod", 1640, false]];
+      seq.forEach(([k, ms, on]) => setTimeout(() => set(k, on), ms));
+    }
+  }
+
+  // ---------- story: the old copy/paste dance, played by scrolling ----------
+  const track = document.getElementById("story-track");
+  if (track) {
+    const vis = document.getElementById("story-vis");
+    const stage = track.querySelector(".story-stage");
+    const words = track.querySelector(".story-words");
+    const wordEls = [...words.querySelectorAll("[data-w]")];
+    const caps = [...track.querySelectorAll("[data-c]")];
+    const chip = document.getElementById("sv-key");
+    const pointer = document.getElementById("sv-cursor");
+    const mod = os && os !== "mac" ? "Ctrl" : "⌘";
+    const capHTML = (keys) =>
+      keys.map((k) => `<span class="cap ${k === mod ? "t" : k === "⇧" ? "o" : k === "space" ? "sp" : ""}">${k}</span>`).join("");
+    const CHIPS = { 1: [mod, "C"], 2: [mod, "V"], 4: [mod, "C"], 5: [mod, "V"], 6: [mod, "⇧", "space"] };
+    const APP = ["slack", "slack", "chat", "chat", "chat", "slack", "slack"];
+    const q = (sel) => vis.querySelector(sel);
+    // where the pointer rests in each beat: [element, x fraction, y fraction] or "end" of a text run
+    const TARGET = {
+      0: [".sv-composer", 0.82, 0.75],
+      1: [".sv-messy .sv-t", "end"],
+      2: [".sv-input", 0.62, 0.78],
+      3: [".sv-send", 0.5, 0.5],
+      4: [".sv-answer .sv-t", "end"],
+      5: [".sv-composer", 0.82, 0.62],
+    };
+    const place = (b) => {
+      const tgt = TARGET[b];
+      if (!tgt) return;
+      const box = vis.getBoundingClientRect();
+      const node = q(tgt[0]);
+      let x, y;
+      if (tgt[1] === "end") {
+        const rects = node.getClientRects();
+        const r = rects[rects.length - 1];
+        x = r.right - box.left;
+        y = r.bottom - box.top - 4;
+      } else {
+        const r = node.getBoundingClientRect();
+        x = r.left - box.left + r.width * tgt[1];
+        y = r.top - box.top + r.height * tgt[2];
+      }
+      pointer.style.setProperty("--x", `${x}px`);
+      pointer.style.setProperty("--y", `${y}px`);
+    };
+
+    let beat = -1;
+    const apply = (b) => {
+      if (b === beat) return;
+      beat = b;
+      vis.dataset.beat = String(b);
+      vis.dataset.app = APP[b];
+      wordEls.forEach((w) => {
+        const i = Number(w.dataset.w);
+        w.classList.toggle("on", b < 6 && i < b);
+        w.classList.toggle("now", b < 6 && i === b);
+      });
+      words.classList.toggle("struck", b === 6);
+      caps.forEach((c) => c.classList.toggle("on", Number(c.dataset.c) === b));
+      if (CHIPS[b]) {
+        chip.innerHTML = capHTML(CHIPS[b]);
+        chip.classList.add("show");
+        chip.classList.remove("tap");
+        void chip.offsetWidth;
+        chip.classList.add("tap");
+      } else chip.classList.remove("show");
+      requestAnimationFrame(() => place(b));
+    };
+
+    const nav = document.querySelector(".nav");
+
+    let ticking = false;
+    const onScroll = () => {
+      ticking = false;
+      const r = track.getBoundingClientRect();
+      const run = r.height - stage.offsetHeight;
+      const p = Math.min(1, Math.max(0, -r.top / run));
+      const sec = track.parentElement.getBoundingClientRect();
+      nav?.classList.toggle("dark", sec.top <= 32 && sec.bottom > 48);
+      apply(Math.min(6, Math.floor(p * 7)));
+    };
+    addEventListener("scroll", () => ticking || ((ticking = true), requestAnimationFrame(onScroll)), { passive: true });
+    addEventListener("resize", () => place(beat));
+    onScroll();
+  }
+
   // ---------- copy buttons ----------
   document.querySelectorAll("[data-copy]").forEach((btn) =>
     btn.addEventListener("click", async () => {
@@ -40,6 +159,7 @@
     const el = {
       where: $("where"), thread: $("thread"), composer: $("composer"), keys: $("keys"), pop: $("pop"),
       tone: $("tone"), modes: $("modes"), input: $("input"), note: $("note"), output: $("output"), go: $("go"),
+      cursor: $("cursor"), app: demo.querySelector(".fake-app"),
     };
     const tabs = [...demo.querySelectorAll("[data-scene]")];
 
@@ -80,6 +200,50 @@
         await wait(speed, t);
       }
     };
+    // ---- the pointer: moves between real elements, drags to select, clicks ----
+    const at = (node, fx = 0.5, fy = 0.5) => {
+      const r = node.getBoundingClientRect();
+      const d = demo.getBoundingClientRect();
+      return [r.left - d.left + r.width * fx, r.top - d.top + r.height * fy];
+    };
+    const moveTo = async ([x, y], ms, t) => {
+      el.cursor.classList.add("on");
+      el.cursor.style.setProperty("--dur", `${reduced ? 0 : ms}ms`);
+      el.cursor.style.setProperty("--x", `${x}px`);
+      el.cursor.style.setProperty("--y", `${y}px`);
+      await wait(reduced ? 0 : ms, t);
+    };
+    const click = async (t) => {
+      el.cursor.classList.add("click");
+      await wait(130, t);
+      el.cursor.classList.remove("click");
+    };
+    const rest = () => at(el.app, 0.86, 0.62);
+    // Drag across `text` inside `host`, growing a highlighted selection under the pointer.
+    const dragSelect = async (host, text, t) => {
+      host.innerHTML = '<span class="sel"></span><span class="mk"></span><span class="rest"></span>';
+      const [sel, mk, restEl] = host.children;
+      restEl.textContent = text;
+      const point = () => at(mk, 0, 0.85);
+      el.cursor.classList.add("text");
+      await moveTo(point(), 650, t);
+      await wait(180, t);
+      const step = Math.max(2, Math.round(text.length / 36));
+      for (let n = 0; n <= text.length; n += step) {
+        sel.textContent = text.slice(0, n);
+        restEl.textContent = text.slice(n);
+        await moveTo(point(), 16, t);
+      }
+      sel.textContent = text;
+      restEl.textContent = "";
+      await moveTo(point(), 16, t);
+      await wait(250, t);
+      el.cursor.classList.remove("text");
+      host.innerHTML = "";
+      host.append(sel);
+      return sel;
+    };
+
     const press = async (node, t) => {
       node.classList.add("press");
       await wait(140, t);
@@ -109,19 +273,20 @@
 
     const play = async (s, t) => {
       reset(s);
-      await wait(600, t);
+      await wait(500, t);
       if (s.selectThread) {
-        el.thread.lastElementChild.querySelector("span").classList.add("sel");
+        const host = el.thread.lastElementChild.querySelector("span");
+        await dragSelect(host, s.messy, t);
       } else {
+        await moveTo(rest(), 500, t);
         const span = document.createElement("span");
         el.composer.prepend(span);
         await type(span, s.messy, t, 18);
-        await wait(500, t);
+        await wait(400, t);
+        const host = document.createElement("span");
         el.composer.innerHTML = "";
-        const sel = document.createElement("span");
-        sel.className = "sel";
-        sel.textContent = s.messy;
-        el.composer.append(sel);
+        el.composer.append(host);
+        await dragSelect(host, s.messy, t);
       }
       await wait(500, t);
       el.keys.classList.add("show");
@@ -134,21 +299,24 @@
       el.pop.classList.add("show");
       await wait(800, t);
       if (s.note) await type(el.note, s.note, t, 40);
-      await wait(450, t);
-      await press(el.go, t);
+      await moveTo(at(el.go, 0.55, 0.6), 650, t);
+      await wait(150, t);
+      await Promise.all([click(t), press(el.go, t)]);
       el.pop.classList.add("working");
       await wait(1500, t);
       el.pop.classList.remove("working");
       el.pop.classList.add("result");
       el.go.textContent = "paste ↵";
       await type(el.output, s.result, t, 8);
-      await wait(1400, t);
-      await press(el.go, t);
+      await moveTo(at(el.go, 0.55, 0.6), 400, t);
+      await wait(900, t);
+      await Promise.all([click(t), press(el.go, t)]);
       el.pop.classList.remove("show");
       el.thread.querySelector(".sel")?.classList.remove("sel");
       el.composer.textContent = s.result;
       el.composer.classList.add("done");
-      await wait(3200, t);
+      await moveTo(rest(), 700, t);
+      await wait(2200, t);
     };
 
     const run = async (start) => {
@@ -160,6 +328,9 @@
           tabs.forEach((b, j) => b.setAttribute("aria-selected", String(j === i)));
           await play(SCENES[i], t);
           i = (i + 1) % SCENES.length;
+          // the pointer walks up and clicks the next example
+          await moveTo(at(tabs[i], 0.5, 0.55), 800, t);
+          await click(t);
         }
       } catch {
         /* a newer run took over */

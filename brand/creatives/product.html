@@ -13,13 +13,13 @@ body{width:100vw;height:100vh;overflow:hidden;font-family:Inter,sans-serif;color
 .doc p{color:#2b2925;font-size:17px;line-height:1.6}
 /* tall layout for phones: product.html?tall#message */
 body.tall .stage{width:640px;height:800px}
-body.tall .win{left:24px;top:24px;width:592px;height:410px}
-body.tall .pop{left:36px;right:auto;top:452px;width:568px}
-body.tall .keys{left:var(--kx,360px);top:var(--ky,400px)}
+body.tall .win{left:28px;top:28px;transform:none;width:584px;height:372px}
+body.tall .side{left:28px;right:28px;top:418px;transform:none;gap:18px}
+body.tall .pop{width:100%}
 .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(16,16,16,.12) 1.6px,transparent 1.8px);background-size:26px 26px}
 
 /* host app window */
-.win{position:absolute;left:70px;top:70px;width:700px;height:540px;background:#fff;border-radius:18px;box-shadow:0 30px 60px -20px rgba(16,16,16,.25),0 0 0 1px var(--line);overflow:hidden;display:flex;flex-direction:column}
+.win{position:absolute;left:64px;top:50%;transform:translateY(-50%);width:640px;height:500px;background:#fff;border-radius:18px;box-shadow:0 30px 60px -20px rgba(16,16,16,.25),0 0 0 1px var(--line);overflow:hidden;display:flex;flex-direction:column}
 .bar{height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--stone-soft)}
 .bar i{width:12px;height:12px;border-radius:50%;background:#DDD3C6}
 .bar span{margin-left:12px;font-size:14px;font-weight:600;color:var(--soft)}
@@ -33,13 +33,16 @@ body.tall .keys{left:var(--kx,360px);top:var(--ky,400px)}
 .field{display:flex;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;font-size:15px;color:var(--soft)}
 .field b{color:var(--ink);font-weight:500}
 
-/* shortcut */
-.keys{position:absolute;left:var(--kx,150px);top:var(--ky,330px);display:flex;gap:8px;transform:rotate(-4deg)}
-kbd{font-family:inherit;font-size:22px;font-weight:500;background:#FBF8F4;border-radius:12px;padding:10px 16px;box-shadow:0 4px 0 #DDD3C6,0 10px 20px -8px rgba(16,16,16,.3)}
-kbd.o{background:var(--pers);box-shadow:0 4px 0 #E25F2A,0 10px 20px -8px rgba(16,16,16,.3)}
+/* right column: the shortcut sits above the popover it opens, both right-aligned */
+.side{position:absolute;right:64px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:22px}
+.keys{display:flex;gap:10px}
+kbd{font-family:inherit;font-size:22px;font-weight:500;line-height:1;min-width:58px;height:54px;display:grid;place-items:center;padding:0 18px;border-radius:13px;background:#FBF8F4;box-shadow:inset 0 -1px 0 rgba(16,16,16,.04),0 5px 0 #DDD3C6,0 14px 24px -10px rgba(16,16,16,.35)}
+kbd.t{background:#8CC4BE;box-shadow:0 5px 0 #0F6B6A,0 14px 24px -10px rgba(16,16,16,.35)}
+kbd.o{background:#FFB08C;box-shadow:0 5px 0 #E25F2A,0 14px 24px -10px rgba(16,16,16,.35)}
+kbd.sp{min-width:150px;font-size:18px}
 
 /* unblurt popover */
-.pop{position:absolute;right:56px;top:180px;width:520px;background:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -24px rgba(16,16,16,.4),0 0 0 1px var(--line)}
+.pop{position:relative;width:520px;background:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -24px rgba(16,16,16,.4),0 0 0 1px var(--line)}
 .pbar{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:16px}
 .pbar .brand{display:flex;align-items:center;gap:9px}
 .pbar img{width:24px;height:24px}
@@ -60,13 +63,15 @@ kbd.o{background:var(--pers);box-shadow:0 4px 0 #E25F2A,0 10px 20px -8px rgba(16
 <div class="dots"></div>
 <div class="stage">
 <div class="win" id="win"></div>
-<div class="keys"><kbd>⌘</kbd><kbd class="o">⇧</kbd><kbd>Space</kbd></div>
+<div class="side">
+<div class="keys"><kbd class="t">⌘</kbd><kbd class="o">⇧</kbd><kbd class="sp">space</kbd></div>
 <div class="pop">
   <div class="pbar"><span class="brand"><img id="logo" src="../mark.svg" alt="">unblurt</span><span class="tone" id="tone"></span></div>
   <div class="modes" id="modes"></div>
   <div class="sorted">sorted.</div>
   <div class="out" id="out"></div>
   <div class="foot"><span>⌘1–7 mode · ⌘T tone</span><span class="act"><b class="ghost">copy</b><b>paste ↵</b></span></div>
+</div>
 </div>
 </div>
 <script>
@@ -82,7 +87,7 @@ const S = {
     out: "Thursday's probably not going to work because of the QA blockers Sam mentioned. Monday looks more realistic, but I need to check with design first. I'll confirm tomorrow.",
   },
   email: {
-    mode: "Email", tone: "warm", keys: ["110px", "470px"],
+    mode: "Email", tone: "warm",
     win: `<div class="bar"><i></i><i></i><i></i><span>New message</span></div>
       <div class="body">
         <div class="field">To <b>accounts@northwind.co</b></div>
@@ -92,7 +97,7 @@ const S = {
     out: "Subject: Invoice #2041, now 14 days overdue\n\nHi there, a quick reminder that invoice #2041 is now 14 days past due. Could you let me know when we can expect payment?\n\nIf the timing is difficult, we're happy to set up a payment plan.\n\nThanks so much!",
   },
   rephrase: {
-    mode: "Rephrase", tone: "neutral", keys: ["110px", "500px"],
+    mode: "Rephrase", tone: "neutral",
     win: `<div class="bar"><i></i><i></i><i></i><span>Q3 update.doc</span></div>
       <div class="body doc">
         <h2>Q3 roadmap</h2>
@@ -102,7 +107,7 @@ const S = {
     out: "The billing timeline doesn't work for us as it stands. We need more time to do it properly.",
   },
   fix: {
-    mode: "Fix", tone: null, keys: ["110px", "500px"],
+    mode: "Fix", tone: null,
     win: `<div class="bar"><i></i><i></i><i></i><span>Release notes</span></div>
       <div class="body doc">
         <h2>What's new in 2.4</h2>
@@ -111,7 +116,7 @@ const S = {
     out: "They're going to love the new export. It's a lot faster than before, and the onboarding is much smoother too.",
   },
   reply: {
-    mode: "Reply", tone: "warm", keys: ["150px", "300px"],
+    mode: "Reply", tone: "warm",
     win: `<div class="bar"><i></i><i></i><i></i><span>Alex Chen</span></div>
       <div class="body">
         <div class="msg"><div class="av" style="background:#8CC4BE"></div><div style="max-width:400px"><b>Alex</b><p><span class="sel">Hey! Any chance you could look over the pitch deck before Friday? Totally fine if you're slammed this week.</span></p></div></div>
@@ -121,7 +126,6 @@ const S = {
   },
 };
 const s = S[location.hash.slice(1)] || S.message;
-if (s.keys && !location.search.includes("tall")) { document.body.style.setProperty("--kx", s.keys[0]); document.body.style.setProperty("--ky", s.keys[1]); }
 win.innerHTML = s.win;
 if (s.tone) tone.textContent = s.tone; else tone.remove();
 out.textContent = s.out;

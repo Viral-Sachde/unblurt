@@ -122,16 +122,12 @@
       requestAnimationFrame(() => place(b));
     };
 
-    const nav = document.querySelector(".nav");
-
     let ticking = false;
     const onScroll = () => {
       ticking = false;
       const r = track.getBoundingClientRect();
       const run = r.height - stage.offsetHeight;
       const p = Math.min(1, Math.max(0, -r.top / run));
-      const sec = track.parentElement.getBoundingClientRect();
-      nav?.classList.toggle("dark", sec.top <= 32 && sec.bottom > 48);
       apply(Math.min(6, Math.floor(p * 7)));
     };
     addEventListener("scroll", () => ticking || ((ticking = true), requestAnimationFrame(onScroll)), { passive: true });

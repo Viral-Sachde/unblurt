@@ -557,6 +557,9 @@ section { scroll-margin-top: 64px; }
 
 .story-after { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 80px); padding-block: clamp(40px, 6vw, 80px) clamp(72px, 10vw, 140px); }
 .story-body { grid-column: 2; }
+.story-side { display: flex; flex-direction: column; gap: clamp(20px, 3vw, 36px); align-self: start; position: sticky; top: 112px; }
+.story-side .h2 { color: #fff; }
+.story-side .byline { margin: 0 !important; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.14); }
 .story-body p { margin: 0 0 1.1em; font-size: clamp(18px, 1.7vw, 21px); line-height: 1.6; letter-spacing: -0.012em; color: rgba(255, 255, 255, 0.74); max-width: 56ch; }
 .story-body p:first-child { color: #fff; }
 .byline { margin: 26px 0 0 !important; display: flex; flex-direction: column; gap: 2px; }
@@ -570,6 +573,7 @@ section { scroll-margin-top: 64px; }
   .story-vis { height: clamp(250px, 40vh, 360px); height: clamp(250px, 40svh, 360px); margin-bottom: 26px; }
   .story-after { grid-template-columns: minmax(0, 1fr); padding-top: 24px; }
   .story-body { grid-column: auto; }
+  .story-side { position: static; }
 }
 @media (max-width: 600px) {
   .sv-tab { padding: 5px 8px; font-size: 12px; }
@@ -609,8 +613,3 @@ section { scroll-margin-top: 64px; }
 .legal a { color: var(--teal); text-underline-offset: 3px; }
 .legal b { font-weight: 600; color: var(--ink); }
 
-/* nav turns dark while the story scene is under it */
-.nav { transition: background-color 0.35s, color 0.35s; }
-.nav.dark { background: rgba(18, 18, 18, 0.78); color: #fff; }
-.nav.dark .nav-links a:not(.btn) { color: rgba(255, 255, 255, 0.66); }
-.nav.dark .nav-links a:not(.btn):hover { color: #fff; }

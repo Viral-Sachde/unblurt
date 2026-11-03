@@ -36,10 +36,11 @@ body.tall .pop{width:100%}
 /* right column: the shortcut sits above the popover it opens, both right-aligned */
 .side{position:absolute;right:64px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:22px}
 .keys{display:flex;gap:10px}
-kbd{font-family:inherit;font-size:22px;font-weight:500;line-height:1;min-width:58px;height:54px;display:grid;place-items:center;padding:0 18px;border-radius:13px;background:#FBF8F4;box-shadow:inset 0 -1px 0 rgba(16,16,16,.04),0 5px 0 #DDD3C6,0 14px 24px -10px rgba(16,16,16,.35)}
-kbd.t{background:#8CC4BE;box-shadow:0 5px 0 #0F6B6A,0 14px 24px -10px rgba(16,16,16,.35)}
-kbd.o{background:#FFB08C;box-shadow:0 5px 0 #E25F2A,0 14px 24px -10px rgba(16,16,16,.35)}
-kbd.sp{min-width:150px;font-size:18px}
+kbd{--fh:#fff;--fl:#f3eee7;--wh:#e9e1d6;--wl:#d3c8b9;--d:7px;position:relative;isolation:isolate;display:grid;place-items:center;font-family:inherit;font-size:22px;font-weight:500;line-height:1;color:#161412;min-width:60px;height:60px;padding:0 19px var(--d);border-radius:14px;background:linear-gradient(180deg,var(--wh),var(--wl));box-shadow:0 1px 1px rgba(16,16,16,.12),0 4px 6px -2px rgba(16,16,16,.16),0 16px 28px -14px rgba(16,16,16,.5)}
+kbd::after{content:"";position:absolute;z-index:-1;inset:1.5px 2.5px var(--d);border-radius:11.5px;background:linear-gradient(180deg,var(--fh),var(--fl));box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -1px 2px rgba(16,16,16,.06),0 1px 1.5px rgba(16,16,16,.14)}
+kbd.t{--fh:#a9d8d2;--fl:#88c3bc;--wh:#2f8a86;--wl:#0b5554}
+kbd.o{--fh:#ffc6aa;--fl:#ffa880;--wh:#f2834f;--wl:#cf5426}
+kbd.sp{min-width:156px;font-size:18px}
 
 /* unblurt popover */
 .pop{position:relative;width:520px;background:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -24px rgba(16,16,16,.4),0 0 0 1px var(--line)}

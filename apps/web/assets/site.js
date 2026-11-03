@@ -112,8 +112,8 @@
       if (b === beat) return;
       beat = b;
       vis.dataset.beat = String(b);
-      // the scroll hint stays up for the first few steps, so a small scroll doesn't chase it away
-      track.classList.toggle("started", b >= 3);
+      // the hint leaves when the first keys appear (beat 1), so the two never overlap
+      track.classList.toggle("started", b >= 1);
       vis.dataset.app = APP[b];
       wordEls.forEach((w) => {
         const i = Number(w.dataset.w);
@@ -132,15 +132,28 @@
       requestAnimationFrame(() => place(b));
     };
 
+    // How long each beat lasts, in screens of scrolling. The opening beat is longer: it's where
+    // the scroll hint shows, and a small scroll shouldn't end it. Must add up to the 7.8 in site.css.
+    const BEATS = [1.8, 1, 1, 1, 1, 1, 1];
+    const TOTAL = BEATS.reduce((a, b) => a + b, 0);
+    const beatAt = (p) => {
+      let edge = 0;
+      for (let i = 0; i < BEATS.length; i++) {
+        edge += BEATS[i] / TOTAL;
+        if (p < edge) return i;
+      }
+      return BEATS.length - 1;
+    };
+
     let ticking = false;
     const onScroll = () => {
       ticking = false;
       const r = track.getBoundingClientRect();
       const run = r.height - stage.offsetHeight;
       const p = Math.min(1, Math.max(0, -r.top / run));
-      // the hint bubble rises once the scene has pinned to the screen
-      track.classList.toggle("near", r.top <= innerHeight * 0.5 && r.bottom > innerHeight);
-      apply(Math.min(6, Math.floor(p * 7)));
+      // the hint rises once the scene has locked into place
+      track.classList.toggle("near", r.top <= 70 && r.bottom > innerHeight);
+      apply(beatAt(p));
     };
     addEventListener("scroll", () => ticking || ((ticking = true), requestAnimationFrame(onScroll)), { passive: true });
     addEventListener("resize", () => place(beat));

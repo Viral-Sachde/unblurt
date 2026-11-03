@@ -43,15 +43,20 @@ button { font: inherit; color: inherit; }
 
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 
+/* Inline shortcut keys: a small version of the hero keycaps (lit face on a darker skirt). */
 kbd {
-  font-family: var(--font);
-  font-size: 0.78em;
-  font-weight: 550;
-  padding: 2px 7px;
-  border-radius: 6px;
-  background: var(--stone-soft);
-  border: 1px solid var(--line);
-  border-bottom-width: 2px;
+  position: relative; isolation: isolate;
+  display: inline-flex; align-items: center; justify-content: center; gap: 1px;
+  min-width: 1.85em; height: 1.75em; padding: 0 0.48em 0.24em; margin: 0 0.06em;
+  border: 0; border-radius: 0.42em; vertical-align: 0.02em;
+  background: linear-gradient(180deg, #e7ded2, #cfc3b4);
+  box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 3px 6px -3px rgba(16, 16, 16, 0.3);
+  font-family: var(--font); font-size: 0.8em; font-weight: 550; line-height: 1; color: #24201c; white-space: nowrap;
+}
+kbd::after {
+  content: ""; position: absolute; z-index: -1; inset: 1px 1.5px 0.24em; border-radius: 0.34em;
+  background: linear-gradient(180deg, #ffffff, #f2ece4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0.5px 1px rgba(16, 16, 16, 0.14);
 }
 
 /* ---------- type ---------- */
@@ -261,7 +266,7 @@ section { scroll-margin-top: 64px; }
 @media (max-width: 1000px) { .modes-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .modes-grid { grid-template-columns: 1fr; } .mode { min-height: 0; } }
 .mode.wide p { margin: 0; font-size: clamp(20px, 2.4vw, 28px); font-weight: 500; letter-spacing: -0.03em; }
-.mode.wide kbd { background: rgba(255, 255, 255, 0.14); color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+.mode.wide kbd { box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 4px 8px -3px rgba(0, 0, 0, 0.35); }
 
 /* ---------- steps / engine ---------- */
 
@@ -444,7 +449,8 @@ section { scroll-margin-top: 64px; }
 /* ---------- story (sticky scroll scene) ---------- */
 
 .story { background: #121212; color: #fff; }
-.story-track { position: relative; height: calc(100vh + 7 * 56vh); height: calc(100svh + 7 * 56svh); }
+/* 7 beats; the opening one is longer so the scroll hint gets a proper moment (see BEATS in site.js) */
+.story-track { position: relative; height: calc(100vh + 7.8 * 56vh); height: calc(100svh + 7.8 * 56svh); }
 .story-stage {
   position: sticky; top: 64px; height: calc(100vh - 64px); height: calc(100svh - 64px);
   display: flex; align-items: center; overflow: hidden;
@@ -578,12 +584,13 @@ section { scroll-margin-top: 64px; }
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
   font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; color: rgba(255, 255, 255, 0.82); white-space: nowrap;
-  opacity: 0; transform: translate(-50%, 48px) scale(0.9); pointer-events: none;
+  --hx: -50%;
+  opacity: 0; transform: translate(var(--hx), 48px) scale(0.9); pointer-events: none;
   transition: opacity 0.45s, transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25);
 }
-.story-track.near .story-hint { opacity: 1; transform: translate(-50%, 0) scale(1); animation: hint-bob 2.4s 0.8s ease-in-out infinite; }
-.story-track.near.started .story-hint { opacity: 0; transform: translate(-50%, 48px) scale(0.9); animation: none; }
-@keyframes hint-bob { 50% { transform: translate(-50%, -5px) scale(1); } }
+.story-track.near .story-hint { opacity: 1; transform: translate(var(--hx), 0) scale(1); animation: hint-bob 2.4s 0.8s ease-in-out infinite; }
+.story-track.near.started .story-hint { opacity: 0; transform: translate(var(--hx), 48px) scale(0.9); animation: none; }
+@keyframes hint-bob { 50% { transform: translate(var(--hx), -5px) scale(1); } }
 .story-hint i { position: relative; width: 16px; height: 24px; border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 8px; flex: none; }
 .story-hint i::after {
   content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 5px; margin-left: -1.5px; border-radius: 2px;
@@ -591,7 +598,10 @@ section { scroll-margin-top: 64px; }
 }
 @keyframes hint-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(8px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
 @media (max-width: 860px) { .story-hint { font-size: 13px; padding: 7px 14px 7px 9px; } }
-@media (max-height: 520px) and (orientation: landscape) { .story-hint { bottom: 10px; } }
+/* phones held sideways: the window fills the bottom right, so the hint sits under the words instead */
+@media (max-height: 520px) and (orientation: landscape) {
+  .story-hint { --hx: 0; left: var(--gutter); bottom: 12px; font-size: 12.5px; padding: 6px 12px 6px 8px; }
+}
 
 .story-after { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 80px); padding-block: clamp(40px, 6vw, 80px) clamp(72px, 10vw, 140px); }
 .story-body { grid-column: 2; }
@@ -788,3 +798,13 @@ section { scroll-margin-top: 64px; }
   .ways .keycaps { gap: 8px; }
   .ways .cap.sp { min-width: 104px; }
 }
+
+/* "How it works" steps: the same keycaps, sized for the little picture boxes */
+.step .art-mini .keycaps { padding: 0; cursor: default; }
+.step .art-mini .cap { cursor: default; }
+.cap.enter { min-width: 84px; font-size: 22px; }
+@media (max-width: 380px) { .step .art-mini .cap.sp { min-width: 104px; } }
+
+/* step 01's sample sentence: wraps inside its box instead of running off the edges */
+.step-sample { padding: 0 20px; text-align: center; font-size: 16.5px; line-height: 1.6; letter-spacing: -0.01em; max-width: 26ch; }
+.step-sample mark { background: #ffd7c4; color: inherit; padding: 2px 1px; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }

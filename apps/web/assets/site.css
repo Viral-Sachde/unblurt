@@ -43,20 +43,15 @@ button { font: inherit; color: inherit; }
 
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 
-/* Inline shortcut keys: a small version of the hero keycaps (lit face on a darker skirt). */
+/* Inline shortcut keys: a small version of the keycaps (soft top on a two-tone wall). */
 kbd {
-  position: relative; isolation: isolate;
+  --d: 0.2em;
   display: inline-flex; align-items: center; justify-content: center; gap: 1px;
-  min-width: 1.85em; height: 1.75em; padding: 0 0.48em 0.24em; margin: 0 0.06em;
-  border: 0; border-radius: 0.42em; vertical-align: 0.02em;
-  background: linear-gradient(180deg, #e7ded2, #cfc3b4);
-  box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 3px 6px -3px rgba(16, 16, 16, 0.3);
-  font-family: var(--font); font-size: 0.8em; font-weight: 550; line-height: 1; color: #24201c; white-space: nowrap;
-}
-kbd::after {
-  content: ""; position: absolute; z-index: -1; inset: 1px 1.5px 0.24em; border-radius: 0.34em;
-  background: linear-gradient(180deg, #ffffff, #f2ece4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0.5px 1px rgba(16, 16, 16, 0.14);
+  min-width: 1.85em; height: 1.65em; padding: 0 0.48em; margin: 0 0.06em var(--d); vertical-align: 0.12em;
+  border: 0; border-radius: 0.42em;
+  background: linear-gradient(180deg, #ffffff, #f4efe8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 calc(var(--d) * 0.45) 0 #ddd3c6, 0 var(--d) 0 #c8bcac, 0 calc(var(--d) + 1px) 1px rgba(0, 0, 0, 0.08), 0 6px 10px -6px rgba(16, 16, 16, 0.35);
+  font-family: var(--font); font-size: 0.8em; font-weight: 550; line-height: 1; color: #3b3631; white-space: nowrap;
 }
 
 /* ---------- type ---------- */
@@ -266,7 +261,7 @@ section { scroll-margin-top: 64px; }
 @media (max-width: 1000px) { .modes-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .modes-grid { grid-template-columns: 1fr; } .mode { min-height: 0; } }
 .mode.wide p { margin: 0; font-size: clamp(20px, 2.4vw, 28px); font-weight: 500; letter-spacing: -0.03em; }
-.mode.wide kbd { box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 4px 8px -3px rgba(0, 0, 0, 0.35); }
+
 
 /* ---------- steps / engine ---------- */
 
@@ -392,41 +387,38 @@ section { scroll-margin-top: 64px; }
 .byline a { text-decoration: none; align-self: flex-start; }
 .byline a:hover b { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- keycaps (hero, demo overlay, story chip) ----------
-   A real keycap: a lit top face (::after) sitting on a darker skirt (the element's own background).
-   --d is how much skirt shows under the face; pressing slides the face and the glyph down into it. */
+/* ---------- keycaps (hero, steps, demo overlay, story chip) ----------
+   A soft-gradient top on a two-tone side wall: the upper part of the wall is lighter, the lower
+   part darker. --d is how tall the wall is; pressing slides the key down onto it.
+   Every keycap on the site, big or small, comes from these rules. */
 
 .cap {
-  --face-hi: #ffffff; --face-lo: #f3eee7; --wall-hi: #e9e1d6; --wall-lo: #d3c8b9;
-  --d: 7px; --press: 4px; --r: 14px;
-  position: relative; isolation: isolate; flex: none;
-  display: inline-grid; place-items: center;
-  height: 60px; min-width: 60px; padding: 0 19px var(--d); border-radius: var(--r);
-  background: linear-gradient(180deg, var(--wall-hi), var(--wall-lo));
-  color: #161412; font-size: 22px; font-weight: 500; line-height: 1; letter-spacing: -0.01em;
-  box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 4px 6px -2px rgba(16, 16, 16, 0.16), 0 16px 28px -14px rgba(16, 16, 16, 0.5);
-  transition: padding 0.08s ease-out, box-shadow 0.08s ease-out;
+  --t1: #ffffff; --t2: #f4efe8; --w1: #ddd3c6; --w2: #c8bcac; --g: #3b3631; --d: 7px;
+  --wall: 0 calc(var(--d) * 0.45) 0 var(--w1), 0 var(--d) 0 var(--w2), 0 calc(var(--d) + 1px) 1px rgba(0, 0, 0, 0.08);
+  --lift: 0 20px 28px -14px rgba(16, 16, 16, 0.5);
+  display: inline-grid; place-items: center; flex: none;
+  height: 56px; min-width: 58px; padding: 0 18px; margin-bottom: var(--d); border-radius: 14px;
+  background: linear-gradient(180deg, var(--t1), var(--t2)); color: var(--g);
+  font-size: 22px; font-weight: 550; line-height: 1; letter-spacing: -0.01em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05), var(--wall), var(--lift);
+  transition: transform 0.1s cubic-bezier(0.3, 0.7, 0.4, 1.4), box-shadow 0.1s;
   user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
 }
-.cap::after {
-  content: ""; position: absolute; z-index: -1;
-  inset: 1.5px 2.5px var(--d); border-radius: calc(var(--r) - 2.5px);
-  background: linear-gradient(180deg, var(--face-hi) 0%, var(--face-lo) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(16, 16, 16, 0.06), 0 1px 1.5px rgba(16, 16, 16, 0.14);
-  transition: transform 0.08s ease-out;
-}
-.cap.t { --face-hi: #a9d8d2; --face-lo: #88c3bc; --wall-hi: #2f8a86; --wall-lo: #0b5554; }
-.cap.o { --face-hi: #ffc6aa; --face-lo: #ffa880; --wall-hi: #f2834f; --wall-lo: #cf5426; }
-.cap.sp { min-width: 156px; font-size: 18px; }
+.cap.t { --t1: #b0dcd6; --t2: #8fc6bf; --w1: #1f7d79; --w2: #0b5554; --g: #0a3d3c; }
+.cap.o { --t1: #ffc9af; --t2: #ffa982; --w1: #ee6f38; --w2: #c84b1d; --g: #5a2008; }
+.cap.sp { min-width: 152px; font-size: 18px; font-weight: 500; }
 
-/* pressed: face and glyph sink into the skirt */
-.cap.down, .keys-overlay.press .cap { padding-top: calc(var(--press) * 2); box-shadow: 0 1px 1px rgba(16, 16, 16, 0.12), 0 3px 4px -2px rgba(16, 16, 16, 0.16), 0 10px 18px -12px rgba(16, 16, 16, 0.45); }
-.cap.down::after, .keys-overlay.press .cap::after { transform: translateY(var(--press)); }
+/* pressed: the key travels down onto its wall */
+.cap.down, .keys-overlay.press .cap {
+  transform: translateY(calc(var(--d) - 1px));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 0 var(--w2), 0 2px 1px rgba(0, 0, 0, 0.08), 0 8px 12px -8px rgba(16, 16, 16, 0.45);
+}
 
 .keycaps { display: flex; gap: 10px; padding: 4px 0 8px; }
 .keycaps .cap { cursor: pointer; }
+@media (hover: hover) { .keycaps .cap:not(.down):hover { transform: translateY(-1px); } }
 @media (max-width: 600px) {
-  .cap { --d: 6px; --r: 12px; height: 52px; min-width: 52px; padding-inline: 16px; font-size: 20px; }
+  .cap { --d: 6px; height: 50px; min-width: 52px; padding: 0 15px; font-size: 20px; border-radius: 12px; }
   .cap.sp { min-width: 126px; font-size: 16px; }
 }
 
@@ -560,12 +552,15 @@ section { scroll-margin-top: 64px; }
   transform: translate(-50%, 10px); opacity: 0; transition: opacity 0.25s, transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 .sv-key.show { opacity: 1; transform: translate(-50%, 0); }
-.sv-key .cap { --d: 6px; --press: 3px; --r: 12px; height: 48px; min-width: 48px; font-size: 18px; padding-inline: 14px; }
+.sv-key .cap { --d: 6px; height: 46px; min-width: 48px; font-size: 18px; padding: 0 14px; border-radius: 12px; }
 .sv-key .cap.sp { min-width: 112px; font-size: 15px; }
 .sv-key.tap .cap { animation: cap-tap 0.5s 0.15s both; }
-.sv-key.tap .cap::after { animation: face-tap 0.5s 0.15s both; }
-@keyframes cap-tap { 40% { padding-top: calc(var(--press) * 2); } }
-@keyframes face-tap { 40% { transform: translateY(var(--press)); } }
+@keyframes cap-tap {
+  40% {
+    transform: translateY(calc(var(--d) - 1px));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 0 var(--w2), 0 2px 1px rgba(0, 0, 0, 0.08), 0 8px 12px -8px rgba(16, 16, 16, 0.45);
+  }
+}
 
 .sv-cursor {
   position: absolute; left: -5px; top: -3px; width: 24px; height: 24px; z-index: 4; pointer-events: none;
@@ -670,7 +665,7 @@ section { scroll-margin-top: 64px; }
   .story-vis { height: calc(100vh - 64px - 64px); height: calc(100svh - 64px - 64px); margin-bottom: 0; }
   .sv-msg { display: none; }
   .sv-key { bottom: -14px; }
-  .sv-key .cap { --d: 5px; --press: 2px; --r: 10px; height: 38px; min-width: 38px; font-size: 15px; padding-inline: 11px; }
+  .sv-key .cap { --d: 4px; height: 36px; min-width: 38px; font-size: 15px; padding: 0 11px; border-radius: 10px; }
   .sv-key .cap.sp { min-width: 84px; font-size: 13px; }
   .sv-pop { top: 50px; }
   .sv-pop-modes, .sv-pop-foot { display: none; }

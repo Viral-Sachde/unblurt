@@ -181,6 +181,14 @@ html[data-window="settings"] body { background: var(--stone-soft); }
 .segmented { display: flex; gap: 4px; flex-wrap: wrap; background: var(--stone-soft); padding: 4px; border-radius: 12px; }
 .segmented button { border: 0; background: transparent; padding: 6px 11px; border-radius: 9px; font-size: 13px; color: var(--ink-soft); }
 .segmented button.on { background: var(--surface); color: var(--ink); font-weight: 550; box-shadow: 0 1px 3px rgba(16, 16, 16, 0.1); }
+.segmented button.custom { min-width: 84px; }
+.segmented button:focus { outline: none; }
+.segmented button:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.segmented button.recording {
+  background: var(--surface); color: var(--persimmon); font-weight: 550;
+  box-shadow: 0 0 0 1.5px var(--persimmon); animation: rec 1.2s ease-in-out infinite alternate;
+}
+@keyframes rec { from { box-shadow: 0 0 0 1.5px rgba(255, 122, 69, 0.45); } to { box-shadow: 0 0 0 1.5px var(--persimmon); } }
 
 .muted { color: var(--ink-soft); }
 .small { font-size: 12.5px !important; }

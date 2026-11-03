@@ -209,6 +209,13 @@ fn set_plate(app: AppHandle, visible: bool) {
     }
 }
 
+/// Frees the global shortcut while Settings records a new one, so pressing the current
+/// combo is captured instead of opening the popover. `set_hotkey` re-registers.
+#[tauri::command]
+fn suspend_hotkey(app: AppHandle) -> Result<(), String> {
+    app.global_shortcut().unregister_all().map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 fn quit(app: AppHandle) {
     app.exit(0);
@@ -236,6 +243,7 @@ pub fn run() {
             hide_popover,
             open_settings,
             set_hotkey,
+            suspend_hotkey,
             plate_drop,
             plate_click,
             set_plate,
@@ -303,4 +311,40 @@ pub fn run() {
             tauri::async_runtime::block_on(app.state::<Engine>().shutdown());
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use tauri_plugin_global_shortcut::Shortcut;
+
+    /// Every accelerator shape the Settings recorder can produce must parse.
+    #[test]
+    fn recorder_accelerators_parse() {
+        let mut keys: Vec<String> = ('A'..='Z').map(|c| format!("Key{c}")).collect();
+        keys.extend((0..=9).map(|d| format!("Digit{d}")));
+        keys.extend((1..=12).map(|n| format!("F{n}")));
+        keys.extend((0..=9).map(|d| format!("Numpad{d}")));
+        for k in [
+            "NumpadAdd", "NumpadDecimal", "NumpadDivide", "NumpadEnter", "NumpadEqual", "NumpadMultiply",
+            "NumpadSubtract", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Enter", "Tab",
+            "Backspace", "Delete", "Home", "End", "PageUp", "PageDown", "Insert", "Minus", "Equal",
+            "BracketLeft", "BracketRight", "Backslash", "Semicolon", "Quote", "Backquote", "Comma",
+            "Period", "Slash",
+        ] {
+            keys.push(k.to_string());
+        }
+        let mod_sets = ["Command", "Control", "Alt", "Super", "Command+Shift", "Control+Alt", "Command+Control+Alt+Shift"];
+        for k in &keys {
+            for m in mod_sets {
+                let accel = format!("{m}+{k}");
+                assert!(accel.parse::<Shortcut>().is_ok(), "failed to parse {accel}");
+            }
+        }
+        for n in 1..=12 {
+            assert!(format!("F{n}").parse::<Shortcut>().is_ok());
+        }
+        for preset in ["CommandOrControl+Shift+Space", "Alt+Space", "CommandOrControl+Shift+U", "CommandOrControl+Alt+J"] {
+            assert!(preset.parse::<Shortcut>().is_ok());
+        }
+    }
 }

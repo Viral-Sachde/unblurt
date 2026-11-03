@@ -104,7 +104,8 @@
       if (b === beat) return;
       beat = b;
       vis.dataset.beat = String(b);
-      track.classList.toggle("started", b > 0);
+      // the scroll hint stays up for the first few steps, so a small scroll doesn't chase it away
+      track.classList.toggle("started", b >= 3);
       vis.dataset.app = APP[b];
       wordEls.forEach((w) => {
         const i = Number(w.dataset.w);
@@ -130,7 +131,7 @@
       const run = r.height - stage.offsetHeight;
       const p = Math.min(1, Math.max(0, -r.top / run));
       // the hint bubble rises once the scene has pinned to the screen
-      track.classList.toggle("near", r.top <= innerHeight * 0.35 && r.bottom > innerHeight);
+      track.classList.toggle("near", r.top <= innerHeight * 0.5 && r.bottom > innerHeight);
       apply(Math.min(6, Math.floor(p * 7)));
     };
     addEventListener("scroll", () => ticking || ((ticking = true), requestAnimationFrame(onScroll)), { passive: true });

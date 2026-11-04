@@ -19,6 +19,13 @@
   --radius-md: 14px;
   --radius-lg: 20px;
 
+  /* motion: iOS-style curves. --spring settles with a hair of overshoot, --ease-out is the
+     sheet curve, --ease-in for things leaving. */
+  --spring: linear(0, 0.06 3%, 0.22 7%, 0.46 12%, 0.7 18%, 0.86 24%, 0.96 31%, 1.02 39%, 1.035 46%,
+    1.03 54%, 1.012 66%, 1.002 80%, 1);
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 0.7, 0.2);
+
   color-scheme: light;
   font-family: var(--font);
   font-feature-settings: "cv11", "ss03";
@@ -74,9 +81,13 @@ html[data-window="popover"], html[data-window="popover"] body { background: tran
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: rise 180ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  transform-origin: 50% 0;
+  animation: card-in 200ms var(--spring) both;
 }
+.card.out { animation: card-out 70ms var(--ease-in) both; pointer-events: none; }
 .card.nudge { animation: nudge 300ms ease; }
+@keyframes card-in { from { opacity: 0; transform: translateY(-8px) scale(0.96); } }
+@keyframes card-out { to { opacity: 0; transform: translateY(-4px) scale(0.97); } }
 @keyframes rise { from { opacity: 0; transform: translateY(6px) scale(0.985); } }
 @keyframes nudge { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
@@ -89,17 +100,23 @@ html[data-window="popover"], html[data-window="popover"] body { background: tran
   border: 0; background: transparent; padding: 4px 9px; border-radius: 999px;
   font-size: 12.5px; color: var(--ink-soft);
 }
+.tone { transition: background 60ms var(--ease-out), transform 140ms var(--spring); }
 .tone:hover { background: var(--stone-soft); }
+.tone:active { transform: scale(0.95); transition-duration: 80ms; }
 .tone-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--persimmon); }
 
 .icon-btn { border: 0; background: transparent; width: 28px; height: 28px; border-radius: 8px; color: var(--ink-faint); display: grid; place-items: center; }
+.icon-btn { transition: background 60ms var(--ease-out), color 60ms var(--ease-out), transform 140ms var(--spring); }
 .icon-btn:hover { background: var(--stone-soft); color: var(--ink); }
+.icon-btn:active { transform: scale(0.9); transition-duration: 80ms; }
 
 .modes { display: flex; gap: 4px; flex-wrap: wrap; }
 .chip {
   border: 0; padding: 6px 11px; border-radius: 999px; font-size: 13px; font-weight: 500;
-  background: transparent; color: var(--ink-soft); transition: background 120ms, color 120ms;
+  background: transparent; color: var(--ink-soft);
+  transition: background 60ms var(--ease-out), color 60ms var(--ease-out), transform 140ms var(--spring);
 }
+.chip:active { transform: scale(0.94); transition-duration: 80ms; }
 .chip:hover { background: var(--stone-soft); color: var(--ink); }
 .chip.on { background: var(--teal); color: #fff; }
 
@@ -127,7 +144,11 @@ html[data-window="popover"], html[data-window="popover"] body { background: tran
 }
 @keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 
-.result { display: flex; flex-direction: column; gap: 8px; animation: rise 220ms ease; }
+.result { display: flex; flex-direction: column; gap: 8px; animation: rise 220ms var(--spring) both; }
+.error { animation: rise 220ms var(--spring) both; }
+.working { animation: rise 120ms var(--ease-out) both; }
+.toast { animation: rise 200ms var(--spring) both; }
+.input, .output { transition: background-color 60ms var(--ease-out), opacity 60ms var(--ease-out); }
 .result-label { display: flex; align-items: baseline; gap: 10px; padding: 0 4px; }
 .result-label span:first-child { font-weight: 600; font-size: 13px; color: var(--teal); }
 .result-meta { font-size: 12px; color: var(--ink-faint); }
@@ -145,11 +166,12 @@ html[data-window="popover"], html[data-window="popover"] body { background: tran
 
 .primary, .ghost {
   border: 0; border-radius: 10px; padding: 7px 12px; font-size: 13.5px; font-weight: 550;
-  display: inline-flex; align-items: center; gap: 8px; transition: background 120ms, transform 80ms;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background 60ms var(--ease-out), transform 140ms var(--spring), opacity 60ms var(--ease-out);
 }
 .primary { background: var(--teal); color: #fff; }
 .primary:hover { background: var(--teal-deep); }
-.primary:active, .ghost:active { transform: scale(0.97); }
+.primary:active, .ghost:active { transform: scale(0.95); transition-duration: 80ms; }
 .primary:disabled { opacity: 0.6; }
 .primary kbd { background: rgba(255, 255, 255, 0.16); border-color: transparent; color: #fff; }
 .ghost { background: var(--stone-soft); color: var(--ink); }
@@ -179,7 +201,15 @@ html[data-window="settings"] body { background: var(--stone-soft); }
 .callout > code { display: block; font-size: 12.5px; background: var(--ink); color: var(--stone); padding: 9px 11px; border-radius: 8px; cursor: copy; }
 
 .segmented { display: flex; gap: 4px; flex-wrap: wrap; background: var(--stone-soft); padding: 4px; border-radius: 12px; }
-.segmented button { border: 0; background: transparent; padding: 6px 11px; border-radius: 9px; font-size: 13px; color: var(--ink-soft); }
+.segmented button {
+  border: 0; background: transparent; padding: 6px 11px; border-radius: 9px; font-size: 13px; color: var(--ink-soft);
+  transition: background 60ms var(--ease-out), color 60ms var(--ease-out), box-shadow 60ms var(--ease-out), transform 140ms var(--spring);
+}
+.segmented button:active { transform: scale(0.95); transition-duration: 80ms; }
+.panel { animation: rise 240ms var(--spring) both; }
+.panel:nth-of-type(2) { animation-delay: 15ms; } .panel:nth-of-type(3) { animation-delay: 30ms; }
+.panel:nth-of-type(4) { animation-delay: 45ms; } .panel:nth-of-type(n+5) { animation-delay: 60ms; }
+.pill { transition: background 60ms var(--ease-out), color 60ms var(--ease-out); }
 .segmented button.on { background: var(--surface); color: var(--ink); font-weight: 550; box-shadow: 0 1px 3px rgba(16, 16, 16, 0.1); }
 .segmented button.custom { min-width: 84px; }
 .segmented button:focus { outline: none; }
@@ -194,7 +224,8 @@ html[data-window="settings"] body { background: var(--stone-soft); }
 .small { font-size: 12.5px !important; }
 .warn { color: var(--persimmon); }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-faint); word-break: break-all; }
-.settings-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
+.settings-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-top: 8px; }
+.settings-credit { display: flex; flex-direction: column; gap: 2px; line-height: 1.45; }
 
 /* ---------- plate (screen edge drop target; left by default, can sit on any edge) ---------- */
 
@@ -209,11 +240,15 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
   border-radius: 0 10px 10px 0;
   background: var(--teal);
   box-shadow: 0 6px 18px -6px rgba(16, 16, 16, 0.35);
-  transition: width 200ms cubic-bezier(0.2, 0.9, 0.3, 1.1), height 200ms cubic-bezier(0.2, 0.9, 0.3, 1.1),
-    background 160ms, border-radius 200ms, padding 200ms;
+  transition: width 120ms var(--ease-out), height 120ms var(--ease-out), background 60ms var(--ease-out),
+    border-radius 120ms var(--ease-out), padding 120ms var(--ease-out), box-shadow 60ms var(--ease-out);
 }
-.plate-mark { flex: none; width: 22px; height: 22px; display: grid; place-items: center; opacity: 0; transition: opacity 120ms; }
-.plate-copy { display: flex; flex-direction: column; gap: 1px; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity 140ms, transform 200ms; }
+.s-drag .plate, .s-got .plate { transition-timing-function: var(--spring); transition-duration: 200ms, 200ms, 100ms, 200ms, 200ms, 100ms; }
+/* the resting tab eases back in when the rail goes away */
+.s-idle .plate { animation: tab-in 100ms var(--ease-out) both; }
+@keyframes tab-in { from { opacity: 0; transform: scale(0.6); } }
+.plate-mark { flex: none; width: 22px; height: 22px; display: grid; place-items: center; opacity: 0; transition: opacity 60ms var(--ease-out), transform 140ms var(--spring); }
+.plate-copy { display: flex; flex-direction: column; gap: 1px; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity 60ms var(--ease-out), transform 140ms var(--spring); }
 .plate-copy b { font-size: 14px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
 .plate-copy small { font-size: 11.5px; color: var(--ink-soft); }
 
@@ -229,13 +264,12 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
 }
 @keyframes plate-breathe { from { opacity: 0.45; } to { opacity: 1; } }
 .s-drag .plate-mark, .s-got .plate-mark { opacity: 1; transform: scale(1.15); }
-.s-drag .plate-copy, .s-got .plate-copy { opacity: 1; transform: none; transition-delay: 60ms; }
+.s-drag .plate-copy, .s-got .plate-copy { opacity: 1; transform: none; transition-delay: 0ms; }
 .s-got .plate { background: var(--teal-tint); }
 .s-got .plate-copy b { color: var(--teal); }
 
 @media (prefers-reduced-motion: reduce) {
-  .plate, .plate-copy, .plate-mark { transition: none; }
-  .s-drag .plate::after { animation: none; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
 }
 
 /* hover rail: three quick actions; labels appear beside the button under the cursor */
@@ -244,24 +278,33 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 7px 6px 7px 5px; border-radius: 0 16px 16px 0;
   background: var(--surface); box-shadow: var(--shadow);
-  animation: pr-in 200ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
+  transform-origin: 0 50%;
+  animation: pr-in 180ms var(--spring) both;
 }
-@keyframes pr-in { from { opacity: 0; transform: translateX(-10px); } }
+.s-leaving .plate-rail { animation: pr-out 90ms var(--ease-in) both; pointer-events: none; }
+@keyframes pr-in { from { opacity: 0; transform: translateX(-10px) scale(0.9); } }
+/* the buttons pop in right behind the rail */
+.plate-rail > [data-row] { animation: pr-item 200ms var(--spring) both; animation-delay: calc(var(--i, 0) * 14ms); }
+@keyframes pr-item { from { opacity: 0; transform: scale(0.8); } }
+@keyframes pr-out { to { opacity: 0; transform: translateX(-8px) scale(0.94); } }
+/* the buttons follow the rail in, one after another */
 .pr-btn {
   position: relative; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px;
   display: grid; place-items: center; background: transparent; color: var(--ink-soft);
-  transition: background 90ms, color 90ms, transform 90ms;
+  transition: background 60ms var(--ease-out), color 60ms var(--ease-out), transform 140ms var(--spring);
 }
 .pr-btn svg { width: 17px; height: 17px; }
+.pr-btn svg { transition: transform 140ms var(--spring); }
 .pr-btn.hot, .pr-btn:hover { background: var(--stone-soft); color: var(--ink); }
+.pr-btn.hot svg { transform: scale(1.08); }
 .pr-btn.primary { background: var(--teal); color: #fff; }
 .pr-btn.primary.hot, .pr-btn.primary:hover { background: var(--teal-deep); color: #fff; }
-.pr-btn.pressed { transform: scale(0.9); }
+.pr-btn.pressed { transform: scale(0.86); transition-duration: 90ms; }
 .pr-tip {
   position: absolute; left: calc(100% + 10px); top: 50%; transform: translate(-4px, -50%);
   white-space: nowrap; font-size: 12px; font-weight: 550; letter-spacing: -0.005em;
   padding: 4px 8px; border-radius: 7px; background: var(--ink); color: var(--surface);
-  opacity: 0; pointer-events: none; transition: opacity 100ms, transform 140ms;
+  opacity: 0; pointer-events: none; transition: opacity 70ms var(--ease-out), transform 160ms var(--spring);
 }
 .pr-btn.hot .pr-tip, .pr-btn:hover .pr-tip { opacity: 1; transform: translate(0, -50%); }
 .pr-sep { width: 20px; height: 1px; background: var(--line); margin: 3px 0; }
@@ -269,7 +312,7 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
 /* the grip: grab it to move the plate to any side or corner */
 .pr-grip {
   position: relative; width: 34px; height: 16px; border-radius: 7px; display: grid; place-items: center;
-  color: var(--ink-faint); cursor: grab; transition: background 90ms, color 90ms;
+  color: var(--ink-faint); cursor: grab; transition: background 60ms var(--ease-out), color 60ms var(--ease-out);
 }
 .pr-grip svg { width: 14px; height: 9px; fill: currentColor; }
 .pr-grip.hot, .pr-grip:hover { background: var(--stone-soft); color: var(--ink-soft); }
@@ -284,7 +327,10 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
 .edge-bottom { align-items: flex-end; justify-content: center; }
 
 /* resting tab */
-.edge-right .plate { border-radius: 10px 0 0 10px; }
+.plate { transform-origin: 0 50%; }
+.edge-right .plate { border-radius: 10px 0 0 10px; transform-origin: 100% 50%; }
+.edge-top .plate { transform-origin: 50% 0; }
+.edge-bottom .plate { transform-origin: 50% 100%; }
 .flat .plate { width: 64px; height: 6px; }
 .edge-top .plate { border-radius: 0 0 10px 10px; }
 .edge-bottom .plate { border-radius: 10px 10px 0 0; }
@@ -299,13 +345,19 @@ html[data-window="plate"], html[data-window="plate"] body { background: transpar
 .edge-bottom.s-drag .plate::after { inset: 8px 8px 0 8px; border-radius: 12px 12px 0 0; border: 1.5px dashed var(--persimmon); border-bottom: 0; }
 
 /* rail: vertical on the sides, horizontal on the top and bottom */
-.edge-right .plate-rail { padding: 7px 5px 7px 6px; border-radius: 16px 0 0 16px; animation-name: pr-in-right; }
+.edge-right .plate-rail { padding: 7px 5px 7px 6px; border-radius: 16px 0 0 16px; animation-name: pr-in-right; transform-origin: 100% 50%; }
 .flat .plate-rail { flex-direction: row; padding: 5px 7px; }
-.edge-top .plate-rail { border-radius: 0 0 16px 16px; padding-top: 5px; animation-name: pr-in-top; }
-.edge-bottom .plate-rail { border-radius: 16px 16px 0 0; animation-name: pr-in-bottom; }
-@keyframes pr-in-right { from { opacity: 0; transform: translateX(10px); } }
-@keyframes pr-in-top { from { opacity: 0; transform: translateY(-10px); } }
-@keyframes pr-in-bottom { from { opacity: 0; transform: translateY(10px); } }
+.edge-top .plate-rail { border-radius: 0 0 16px 16px; padding-top: 5px; animation-name: pr-in-top; transform-origin: 50% 0; }
+.edge-bottom .plate-rail { border-radius: 16px 16px 0 0; animation-name: pr-in-bottom; transform-origin: 50% 100%; }
+.edge-right.s-leaving .plate-rail { animation-name: pr-out-right; }
+.edge-top.s-leaving .plate-rail { animation-name: pr-out-top; }
+.edge-bottom.s-leaving .plate-rail { animation-name: pr-out-bottom; }
+@keyframes pr-in-right { from { opacity: 0; transform: translateX(10px) scale(0.9); } }
+@keyframes pr-in-top { from { opacity: 0; transform: translateY(-10px) scale(0.9); } }
+@keyframes pr-in-bottom { from { opacity: 0; transform: translateY(10px) scale(0.9); } }
+@keyframes pr-out-right { to { opacity: 0; transform: translateX(8px) scale(0.94); } }
+@keyframes pr-out-top { to { opacity: 0; transform: translateY(-8px) scale(0.94); } }
+@keyframes pr-out-bottom { to { opacity: 0; transform: translateY(8px) scale(0.94); } }
 .flat .pr-sep { width: 1px; height: 20px; margin: 0 3px; }
 .flat .pr-grip { width: 16px; height: 34px; }
 .flat .pr-grip svg { transform: rotate(90deg); }

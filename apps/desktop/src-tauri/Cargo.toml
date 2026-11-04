@@ -25,4 +25,5 @@ enigo = "0.6"
 # Remember and re-activate the app you came from, without hiding unblurt's other windows (the plate).
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
-objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "libc", "NSApplication", "NSEvent", "NSResponder", "NSWorkspace", "NSRunningApplication"] }
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "libc", "NSApplication", "NSEvent", "NSResponder", "NSWorkspace", "NSRunningApplication", "NSScreen", "NSWindow"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSArray", "NSGeometry"] }

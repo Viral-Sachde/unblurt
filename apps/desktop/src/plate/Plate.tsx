@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { Mark } from "../components/Mark";
 import { api } from "../lib/api";
@@ -14,19 +14,32 @@ import { loadPrefs, savePrefs, type PlateEdge } from "../lib/prefs";
 // grabbed and "paste" lands back in it. Because of that, macOS won't send it hover events, so Rust
 // watches the cursor and reports it here ("plate-pointer").
 
-type State = "idle" | "menu" | "drag" | "got";
+// "leaving": the rail is fading out.
+type State = "idle" | "menu" | "leaving" | "drag" | "got";
 
-// Window size per state, in logical px, for a plate on a side (left/right) or on the top/bottom.
-// Rust re-pins the window to its edge after every resize. The menu window is bigger than the rail
-// so each button's label fits next to it.
-const SIZE: Record<"side" | "flat", Record<State, [number, number]>> = {
-  side: { idle: [16, 176], menu: [176, 176], drag: [248, 176], got: [248, 176] },
-  flat: { idle: [176, 16], menu: [236, 104], drag: [248, 176], got: [248, 176] },
-};
+// The window is one fixed size (Rust's PLATE_WIN) and never resizes: everything in it animates
+// with transforms, which the GPU does without re-laying-out the page. The empty parts of the
+// window let clicks through; we tell Rust which part is visible ("hit") after every change.
+const WIN: [number, number] = [248, 176];
+const TAB = 16; // how far the resting tab's hover zone reaches in from the edge
+const RAIL_PAD = 6; // a little slack around the rail so its edge doesn't flicker
 const orient = (e: PlateEdge) => (e === "left" || e === "right" ? "side" : "flat");
 
 type Moved = { edge: PlateEdge; offset: number; monitor: string | null };
-const LEAVE_GRACE_MS = 320;
+const LEAVE_GRACE_MS = 60;
+const EXIT_MS = 90; // rail fade-out (matches pr-out in styles.css)
+
+// The resting tab's hover zone: a thin strip along the edge.
+function tabHit(edge: PlateEdge): [number, number, number, number] {
+  const [W, H] = WIN;
+  const flatW = 176;
+  switch (edge) {
+    case "left": return [0, 0, TAB, H];
+    case "right": return [W - TAB, 0, TAB, H];
+    case "top": return [(W - flatW) / 2, 0, flatW, TAB];
+    case "bottom": return [(W - flatW) / 2, H - TAB, flatW, TAB];
+  }
+}
 
 type Action = { kind: "mode"; mode: ModeId } | { kind: "clipboard" };
 
@@ -59,9 +72,37 @@ export function Plate() {
   const [hot, setHot] = useState<string | null>(null);
   const [pressed, setPressed] = useState<string | null>(null);
   const depth = useRef(0); // dragenter/dragleave fire for children too; count them
-  const timers = useRef<{ got?: number; leave?: number }>({});
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  const timers = useRef<{ got?: number; leave?: number; exit?: number }>({});
+  const stateRef = useRef<State>("idle");
+  const railRef = useRef<HTMLDivElement>(null);
+
+  const go = useCallback((next: State) => {
+    const cur = stateRef.current;
+    if (cur === next) return;
+    const t = timers.current;
+    window.clearTimeout(t.exit);
+    if (next === "idle" && cur === "menu") {
+      // fade the rail out, then rest
+      stateRef.current = "leaving";
+      setState("leaving");
+      t.exit = window.setTimeout(() => stateRef.current === "leaving" && go("idle"), EXIT_MS);
+      return;
+    }
+    stateRef.current = next;
+    setState(next);
+  }, []);
+
+  // Tell Rust which part of the window is there to be hovered and clicked.
+  useLayoutEffect(() => {
+    let hit = tabHit(edge);
+    if ((state === "menu" || state === "leaving") && railRef.current) {
+      const r = railRef.current; // offset* ignore the entrance transform, so this is the settled box
+      hit = [r.offsetLeft - RAIL_PAD, r.offsetTop - RAIL_PAD, r.offsetWidth + RAIL_PAD * 2, r.offsetHeight + RAIL_PAD * 2];
+    } else if (state === "drag" || state === "got") {
+      hit = [0, 0, WIN[0], WIN[1]];
+    }
+    api.plateHit(...hit).catch(() => {});
+  }, [state, edge]);
 
   // Show or hide the plate, at its saved spot, and follow changes made in settings.
   useEffect(() => {
@@ -77,15 +118,15 @@ export function Plate() {
   }, []);
 
   useEffect(() => {
-    const [w, h] = SIZE[orient(edge)][state];
-    api.sizePlate(w, h).catch(() => {});
     if (state !== "menu") setHot(null);
-  }, [state, edge]);
+  }, [state]);
 
   // Dropped somewhere new: remember the spot and turn to fit that edge.
   useEffect(() => {
     const un = listen<Moved>("plate-moved", ({ payload }) => {
       savePrefs({ plateEdge: payload.edge, plateOffset: payload.offset, plateMonitor: payload.monitor });
+      window.clearTimeout(timers.current.exit);
+      stateRef.current = "idle";
       setEdge(payload.edge);
       setState("idle");
     });
@@ -101,27 +142,27 @@ export function Plate() {
       const t = timers.current;
       if (payload.inside) {
         window.clearTimeout(t.leave);
-        if (stateRef.current === "idle") setState("menu");
+        if (stateRef.current === "idle" || stateRef.current === "leaving") go("menu");
         const row = document.elementFromPoint(payload.x, payload.y)?.closest<HTMLElement>("[data-row]");
         setHot(row?.dataset.row ?? null);
       } else {
         setHot(null);
         if (stateRef.current === "menu") {
           window.clearTimeout(t.leave);
-          t.leave = window.setTimeout(() => setState((s) => (s === "menu" ? "idle" : s)), LEAVE_GRACE_MS);
+          t.leave = window.setTimeout(() => stateRef.current === "menu" && go("idle"), LEAVE_GRACE_MS);
         }
       }
     });
     return () => {
       un.then((f) => f());
     };
-  }, []);
+  }, [go]);
 
   const act = (id: string, a: Action) => {
     setPressed(id);
     window.setTimeout(() => {
       setPressed(null);
-      setState("idle");
+      go("idle");
       if (a.kind === "clipboard") {
         api.plateAction(null, true).catch(() => {});
       } else {
@@ -130,10 +171,11 @@ export function Plate() {
     }, 120);
   };
 
-  const rail = (id: string, a: Action, name: string, icon: React.ReactNode, primary = false) => (
+  const rail = (i: number, id: string, a: Action, name: string, icon: React.ReactNode, primary = false) => (
     <button
       key={id}
       data-row={id}
+      style={{ "--i": i } as React.CSSProperties}
       aria-label={name}
       className={`pr-btn${primary ? " primary" : ""}${hot === id ? " hot" : ""}${pressed === id ? " pressed" : ""}`}
       onClick={(e) => {
@@ -155,7 +197,7 @@ export function Plate() {
         depth.current++;
         window.clearTimeout(timers.current.got);
         window.clearTimeout(timers.current.leave);
-        setState("drag");
+        go("drag");
       }}
       onDragOver={(e) => {
         if (!hasText(e)) return;
@@ -165,23 +207,24 @@ export function Plate() {
       }}
       onDragLeave={() => {
         depth.current = Math.max(0, depth.current - 1);
-        if (depth.current === 0) setState((s) => (s === "drag" ? "idle" : s));
+        if (depth.current === 0 && stateRef.current === "drag") go("idle");
       }}
       onDrop={(e) => {
         e.preventDefault();
         depth.current = 0;
         const text = e.dataTransfer.getData("text/plain");
-        if (!text.trim()) return setState("idle");
-        setState("got");
+        if (!text.trim()) return go("idle");
+        go("got");
         api.plateDrop(text).catch(() => {});
-        timers.current.got = window.setTimeout(() => setState("idle"), 700);
+        timers.current.got = window.setTimeout(() => go("idle"), 700);
       }}
     >
-      {state === "menu" ? (
-        <div className="plate-rail" role="menu" aria-label="unblurt quick actions">
+      {state === "menu" || state === "leaving" ? (
+        <div ref={railRef} className="plate-rail" role="menu" aria-label="unblurt quick actions">
           <span
             className={`pr-grip${hot === "grip" ? " hot" : ""}`}
             data-row="grip"
+            style={{ "--i": 0 } as React.CSSProperties}
             role="button"
             aria-label="Drag to move the plate"
             onMouseDown={(e) => {
@@ -196,10 +239,10 @@ export function Plate() {
             </svg>
             <span className="pr-tip">Drag to move</span>
           </span>
-          {rail("rephrase", { kind: "mode", mode: "rephrase" }, "Rephrase", ICONS.rephrase, true)}
-          {rail("shorten", { kind: "mode", mode: "shorten" }, "Shorter", ICONS.shorter)}
+          {rail(1, "rephrase", { kind: "mode", mode: "rephrase" }, "Rephrase", ICONS.rephrase, true)}
+          {rail(2, "shorten", { kind: "mode", mode: "shorten" }, "Shorter", ICONS.shorter)}
           <span className="pr-sep" />
-          {rail("clipboard", { kind: "clipboard" }, "From clipboard", ICONS.clipboard)}
+          {rail(3, "clipboard", { kind: "clipboard" }, "From clipboard", ICONS.clipboard)}
         </div>
       ) : (
         <div className="plate" aria-label="unblurt plate: drop text here">

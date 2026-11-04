@@ -44,6 +44,14 @@ static PLATE_DRAGGING: AtomicBool = AtomicBool::new(false);
 /// The plate window's size as last requested (logical px). Used instead of asking the window,
 /// which keeps reporting the old size for a moment after a resize.
 static PLATE_SIZE: Mutex<(f64, f64)> = Mutex::new((16.0, 176.0));
+/// The plate window's fixed size (logical px). It never resizes while in use: resizing a
+/// webview window re-lays-out and repaints the page mid-animation, which is what made it janky.
+/// Everything inside animates with transforms instead, and the empty parts let clicks through.
+const PLATE_WIN: (f64, f64) = (248.0, 176.0);
+/// The part of the plate window that's actually there right now (logical px, window-relative):
+/// the tab, the rail or the landing pad. Reported by the plate window. Outside it the window
+/// ignores the mouse, so the transparent rest of it never blocks the app underneath.
+static PLATE_HIT: Mutex<(f64, f64, f64, f64)> = Mutex::new((0.0, 0.0, 16.0, 176.0));
 
 /// `UNBLURT_DEBUG=1` prints what the plate is doing (moves, snaps) to stderr.
 macro_rules! debug_log {
@@ -128,7 +136,75 @@ fn place_plate(app: &AppHandle) {
     let (w, h) = ((lw * scale).round() as i32, (lh * scale).round() as i32);
     let (x, y) = plate_pos::place(area_of(&m), w, h, pos.edge, pos.offset);
     debug_log!("place: {:?} {:.2} {}x{} -> {},{}", pos.edge, pos.offset, w, h, x, y);
-    let _ = win.set_position(PhysicalPosition::new(x, y));
+    set_plate_frame(&win, (x, y), (lw, lh), scale);
+}
+
+/// Moves and resizes the plate in one go. Setting size and position separately shows a frame in
+/// between where the window has its new size at its old spot, so the plate visibly jumps (most
+/// of all on the right and bottom edges, where it grows away from its anchor).
+/// `pos` is physical, `size` logical; `scale` converts between them.
+fn set_plate_frame(win: &WebviewWindow, pos: (i32, i32), size: (f64, f64), scale: f64) {
+    #[cfg(target_os = "macos")]
+    if mac_set_frame(win, pos, size, scale) {
+        return;
+    }
+    let _ = win.set_size(LogicalSize::new(size.0, size.1));
+    let _ = win.set_position(PhysicalPosition::new(pos.0, pos.1));
+}
+
+#[cfg(target_os = "macos")]
+fn mac_set_frame(win: &WebviewWindow, (x, y): (i32, i32), (w, h): (f64, f64), scale: f64) -> bool {
+    use objc2::MainThreadMarker;
+    use objc2_app_kit::{NSScreen, NSWindow};
+    use objc2_foundation::{NSPoint, NSRect, NSSize};
+    let Some(mtm) = MainThreadMarker::new() else { return false };
+    let Ok(ptr) = win.ns_window() else { return false };
+    if ptr.is_null() || scale <= 0.0 {
+        return false;
+    }
+    // AppKit measures from the bottom-left of the main screen, in points
+    let Some(main) = NSScreen::screens(mtm).firstObject() else { return false };
+    let main_h = main.frame().size.height;
+    let (lx, ly) = (x as f64 / scale, y as f64 / scale);
+    // SAFETY: tauri hands out the live NSWindow behind this webview window; we're on the main thread.
+    let ns: &NSWindow = unsafe { &*(ptr as *const NSWindow) };
+    ns.setFrame_display(NSRect::new(NSPoint::new(lx, main_h - ly - h), NSSize::new(w, h)), true);
+    true
+}
+
+/// Slides the plate from where it is to its spot on the edge instead of teleporting there.
+/// Runs off the main thread; each step hops onto it. Calls `done` on the main thread at the end.
+fn glide_plate(app: &AppHandle, done: impl FnOnce(&AppHandle) + Send + 'static) {
+    let Some(win) = plate(app) else { return done(app) };
+    let pos = plate_pos();
+    let Some(m) = plate_monitor(app, &pos).or_else(|| win.current_monitor().ok().flatten()) else { return done(app) };
+    let Ok(from) = win.outer_position() else { return done(app) };
+    let (lw, lh) = plate_size();
+    let scale = m.scale_factor();
+    let (w, h) = ((lw * scale).round() as i32, (lh * scale).round() as i32);
+    let to = plate_pos::place(area_of(&m), w, h, pos.edge, pos.offset);
+    let from = (from.x, from.y);
+    let app = app.clone();
+    std::thread::spawn(move || {
+        const STEPS: u32 = 12; // ~100ms at 8ms a step
+        for i in 1..=STEPS {
+            let t = i as f64 / STEPS as f64;
+            let e = 1.0 - (1.0 - t).powi(3); // ease out
+            let p = (
+                (from.0 as f64 + (to.0 - from.0) as f64 * e).round() as i32,
+                (from.1 as f64 + (to.1 - from.1) as f64 * e).round() as i32,
+            );
+            let handle = app.clone();
+            let _ = app.run_on_main_thread(move || {
+                if let Some(w) = plate(&handle) {
+                    set_plate_frame(&w, p, (lw, lh), scale);
+                }
+            });
+            std::thread::sleep(Duration::from_millis(8));
+        }
+        let handle = app.clone();
+        let _ = app.run_on_main_thread(move || done(&handle));
+    });
 }
 
 /// Where the plate was let go (the cursor at release, in physical pixels): snap to the nearest
@@ -144,8 +220,11 @@ fn snap_plate(app: &AppHandle, (cx, cy): (f64, f64)) {
     if let Ok(mut cur) = PLATE_POS.lock() {
         *cur = pos.clone();
     }
-    let _ = app.emit_to("plate", "plate-moved", pos);
-    place_plate(app);
+    // glide there first, then tell the plate window, which turns to fit the edge and settles
+    glide_plate(app, move |app| {
+        let _ = app.emit_to("plate", "plate-moved", pos);
+        place_plate(app);
+    });
 }
 
 #[cfg(target_os = "macos")]
@@ -162,23 +241,33 @@ fn mouse_down() -> Option<bool> {
 fn watch_plate_pointer(app: AppHandle) {
     std::thread::spawn(move || {
         let mut last: Option<PlatePointer> = None;
+        let mut tick: u32 = 0;
         loop {
-            std::thread::sleep(Duration::from_millis(40));
+            // ~250Hz, so hover reacts within a frame of the cursor arriving
+            std::thread::sleep(Duration::from_millis(4));
             if !PLATE_ON.load(Ordering::Relaxed) {
                 last = None;
                 continue;
             }
             // keep note of the app you're working in, before a click on the plate activates us
-            front::track();
+            tick = tick.wrapping_add(1);
+            if tick % 16 == 0 {
+                front::track();
+            }
             let Some(win) = plate(&app) else { continue };
             let (Ok(c), Ok(pos), Ok(scale)) = (app.cursor_position(), win.outer_position(), win.scale_factor()) else {
                 continue;
             };
-            let (lw, lh) = plate_size();
-            let (dx, dy) = (c.x - pos.x as f64, c.y - pos.y as f64);
-            let inside = dx >= 0.0 && dy >= 0.0 && dx < lw * scale && dy < lh * scale;
+            let (hx, hy, hw, hh) = PLATE_HIT.lock().map(|h| *h).unwrap_or((0.0, 0.0, 0.0, 0.0));
+            let (lx, ly) = ((c.x - pos.x as f64) / scale, (c.y - pos.y as f64) / scale);
+            let inside = PLATE_DRAGGING.load(Ordering::Relaxed)
+                || (lx >= hx && ly >= hy && lx < hx + hw && ly < hy + hh);
+            // only the visible part takes the mouse (and dragged text)
+            if last.as_ref().map(|l| l.inside) != Some(inside) {
+                let _ = win.set_ignore_cursor_events(!inside);
+            }
             let now = if inside {
-                PlatePointer { inside, x: (dx / scale) as i32, y: (dy / scale) as i32 }
+                PlatePointer { inside, x: lx as i32, y: ly as i32 }
             } else {
                 PlatePointer { inside, x: 0, y: 0 }
             };
@@ -341,15 +430,24 @@ fn plate_action(app: AppHandle, mode: Option<String>, clipboard: bool) {
     });
 }
 
+/// Where the visible plate is inside its window (logical px). See `PLATE_HIT`.
+#[tauri::command]
+fn plate_hit(x: f64, y: f64, width: f64, height: f64) {
+    if let Ok(mut h) = PLATE_HIT.lock() {
+        *h = (x, y, width, height);
+    }
+}
+
 /// Resizes the plate and re-pins it to the left edge, centred, so it grows and shrinks in place
 /// whatever order the startup placement and the first resize arrive in.
 #[tauri::command]
 fn size_plate(app: AppHandle, width: f64, height: f64) {
-    let Some(win) = plate(&app) else { return };
+    if plate(&app).is_none() {
+        return;
+    }
     if let Ok(mut s) = PLATE_SIZE.lock() {
         *s = (width, height);
     }
-    let _ = win.set_size(LogicalSize::new(width, height));
     place_plate(&app);
 }
 
@@ -367,7 +465,7 @@ fn plate_drag(app: AppHandle) {
     let finish = |app: AppHandle, point: (f64, f64)| {
         let handle = app.clone();
         let _ = app.run_on_main_thread(move || snap_plate(&handle, point));
-        // and once more after the window has settled into its new size
+        // and once more after the glide, and after the window has settled into its new size
         std::thread::sleep(Duration::from_millis(300));
         let handle = app.clone();
         let _ = app.run_on_main_thread(move || {
@@ -386,11 +484,15 @@ fn plate_drag(app: AppHandle) {
         debug_log!("drag: follow cursor, grabbed at {grab:?}");
         std::thread::spawn(move || {
             let mut point = (c.x, c.y);
-            for _ in 0..(60 * 60 * 2) {
+            for _ in 0..(120 * 60 * 2) {
                 if mouse_down() != Some(true) {
                     break;
                 }
                 if let Ok(c) = app.cursor_position() {
+                    if (c.x, c.y) == point {
+                        std::thread::sleep(Duration::from_millis(8));
+                        continue;
+                    }
                     point = (c.x, c.y);
                     let (x, y) = ((c.x - grab.0).round() as i32, (c.y - grab.1).round() as i32);
                     let handle = app.clone();
@@ -400,7 +502,7 @@ fn plate_drag(app: AppHandle) {
                         }
                     });
                 }
-                std::thread::sleep(Duration::from_millis(16));
+                std::thread::sleep(Duration::from_millis(8));
             }
             debug_log!("drag: released at {point:?}");
             finish(app, point);
@@ -450,6 +552,10 @@ fn set_plate(app: AppHandle, visible: bool, edge: Option<Edge>, offset: Option<f
     }
     PLATE_ON.store(visible, Ordering::Relaxed);
     if visible {
+        if let Ok(mut s) = PLATE_SIZE.lock() {
+            *s = PLATE_WIN;
+        }
+        let _ = win.set_ignore_cursor_events(true);
         place_plate(&app);
         let _ = win.show();
     } else {
@@ -495,6 +601,7 @@ pub fn run() {
             plate_drop,
             plate_action,
             size_plate,
+            plate_hit,
             plate_drag,
             set_plate,
             quit

@@ -33,6 +33,31 @@ export function Popover() {
 
   const current = modeById(mode);
 
+  // The window lives for the whole session, so replay the card's entrance on every summon,
+  // and let it fade out before the window hides.
+  const closing = useRef(false);
+  const replayIn = () => {
+    const card = cardRef.current;
+    if (!card) return;
+    closing.current = false;
+    card.classList.remove("out");
+    card.style.animation = "none";
+    void card.offsetWidth; // restart the animation
+    card.style.animation = "";
+  };
+  const close = () => {
+    const card = cardRef.current;
+    if (!card || closing.current) return;
+    closing.current = true;
+    card.classList.add("out");
+    window.setTimeout(() => {
+      if (!closing.current) return;
+      api.hide();
+      card.classList.remove("out");
+      closing.current = false;
+    }, 70);
+  };
+
   // Apply the saved global shortcut once at launch; this window lives for the whole session.
   useEffect(() => {
     api.setHotkey(loadPrefs().hotkey).catch(() => {});
@@ -42,6 +67,7 @@ export function Popover() {
   useEffect(() => {
     const un = listen<{ text: string; mode?: string | null; run?: boolean }>("summon", ({ payload }) => {
       runId.current++;
+      replayIn();
       const m = MODES.find((x) => x.id === payload.mode);
       if (m) {
         setMode(m.id);
@@ -159,7 +185,7 @@ export function Popover() {
       if (e.key === "Escape") {
         e.preventDefault();
         if (phase === "working") backToEdit();
-        else api.hide();
+        else close();
         return;
       }
       if (mod && /^[1-7]$/.test(e.key)) {
@@ -205,7 +231,7 @@ export function Popover() {
                 <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
               </svg>
             </button>
-            <button className="icon-btn" onClick={() => api.hide()} title="Close · esc" aria-label="Close">
+            <button className="icon-btn" onClick={close} title="Close · esc" aria-label="Close">
               <svg width="13" height="13" viewBox="0 0 12 12">
                 <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>

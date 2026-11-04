@@ -34,6 +34,8 @@ export const api = {
   plateDrop: (text: string) => invoke<void>("plate_drop", { text }),
   plateAction: (mode: string | null, clipboard: boolean) => invoke<void>("plate_action", { mode, clipboard }),
   sizePlate: (width: number, height: number) => invoke<void>("size_plate", { width, height }),
+  /** The visible part of the plate, in its window's px; the rest of the window lets clicks through. */
+  plateHit: (x: number, y: number, width: number, height: number) => invoke<void>("plate_hit", { x, y, width, height }),
   /** Shows or hides the plate; edge/offset/monitor (from prefs) say where it goes. */
   setPlate: (visible: boolean, edge?: PlateEdge, offset?: number, monitor?: string | null) =>
     invoke<void>("set_plate", { visible, edge, offset, monitor }),

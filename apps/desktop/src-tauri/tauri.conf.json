@@ -30,7 +30,7 @@
       {
         "label": "plate",
         "title": "unblurt plate",
-        "width": 16,
+        "width": 248,
         "height": 176,
         "decorations": false,
         "transparent": true,
@@ -74,7 +74,8 @@
       "icons/icon.ico"
     ],
     "macOS": {
-      "minimumSystemVersion": "11.0"
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-"
     }
   }
 }

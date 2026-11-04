@@ -40,7 +40,7 @@ The Vercel project `unblurt` is connected to this GitHub repo with its root dire
 
 ## Editing notes
 
-- **Download links:** the buttons point to `#releases`. Swap in GitHub Releases URLs once installers are published.
+- **Download links:** each file link has a `data-asset` pattern; `site.js` points it at the matching file in the latest GitHub Release. Without JS (or if the API is down) they open the latest release page.
 - **Imagery:** don't edit `product-*.png` or `og.png` by hand. Change `brand/creatives/` and run `brand/creatives/render.sh`.
 - **Story scene:** `#story` is a tall track with a sticky stage. Scroll progress picks one of 7 beats (`data-beat` 0 to 6) and CSS does the rest. Captions live in `.story-caps`.
 - **Legal pages:** if the app starts sending data anywhere new (analytics, updates, crash reports), update `privacy.html` in the same change.

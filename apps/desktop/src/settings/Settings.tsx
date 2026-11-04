@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getVersion } from "@tauri-apps/api/app";
 import { Mark } from "../components/Mark";
 import { api, errorText, type EngineStatus, type ModelOption } from "../lib/api";
 import { TONES, type Tone } from "../lib/modes";
@@ -15,6 +16,11 @@ export function Settings() {
   const [hotkeyError, setHotkeyError] = useState("");
   const [recording, setRecording] = useState(false);
   const [held, setHeld] = useState("");
+  const [version, setVersion] = useState("");
+
+  useEffect(() => {
+    getVersion().then(setVersion).catch(() => {});
+  }, []);
 
   const refresh = async (restart = false) => {
     setBusy(true);
@@ -244,7 +250,12 @@ export function Settings() {
       </section>
 
       <footer className="settings-foot">
-        <span className="muted small">v0.1.0</span>
+        <div className="settings-credit">
+          <span className="muted small">{version ? `unblurt v${version}` : "unblurt"}</span>
+          <span className="muted small">
+            <span aria-hidden="true">☕</span> All this technical bakajiki, built on kofooo by Viral Sachde.
+          </span>
+        </div>
         <button className="ghost" onClick={() => api.quit()}>
           quit unblurt
         </button>

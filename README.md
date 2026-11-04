@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://unblurt.vercel.app"><img alt="Website" src="https://img.shields.io/badge/site-unblurt.vercel.app-0F6B6A?style=flat-square" /></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-FF7A45?style=flat-square" />
+  <a href="https://github.com/Viral-Sachde/unblurt/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Viral-Sachde/unblurt?style=flat-square&color=FF7A45&label=release" /></a>
   <img alt="Platforms" src="https://img.shields.io/badge/macOS%20·%20Windows%20·%20Linux-101010?style=flat-square" />
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square&logo=tauri&logoColor=white" />
   <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-000000?style=flat-square&logo=rust" />
@@ -94,6 +94,12 @@
 - **Honest failures.** When a provider is rate-limited or out of quota, opencode retries silently. unblurt watches `/session/status` and tells you why instead of spinning forever.
 - **Finds opencode on its own.** It asks your login shell for the path, because GUI apps don't inherit `PATH`. Set `UNBLURT_OPENCODE=/path/to/opencode` to override.
 
+## ✦ Download
+
+Installers for macOS (Apple silicon and Intel), Windows and Linux are on the [**Releases page**](https://github.com/Viral-Sachde/unblurt/releases/latest), and at [unblurt.vercel.app/download](https://unblurt.vercel.app/download). What changed in each version is in [`CHANGELOG.md`](CHANGELOG.md).
+
+The beta builds aren't signed with a paid certificate yet. On first open, macOS needs **System Settings → Privacy & Security → Open Anyway**; Windows needs **More info → Run anyway**.
+
 ## ✦ Quick start
 
 **1. Get the engine**
@@ -118,10 +124,25 @@ You'll need Node 18+, [Rust](https://rustup.rs) stable, and the [Tauri prerequis
 
 More detail in [`apps/desktop/README.md`](apps/desktop/README.md).
 
+## ✦ Releasing
+
+One version number lives in three files (`apps/desktop/package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`). Keep them in step with the script:
+
+```bash
+node scripts/set-version.mjs 0.2.0     # bump all three
+# add a "## [0.2.0] - YYYY-MM-DD" section to CHANGELOG.md
+git commit -am "Release v0.2.0"
+git tag v0.2.0 && git push origin main v0.2.0
+```
+
+Pushing the tag runs [`.github/workflows/release.yml`](.github/workflows/release.yml): it checks the versions and the changelog match the tag, tests and builds on macOS (Apple silicon and Intel), Windows and Linux, uploads the installers and publishes the release with that changelog section as its notes. The download page picks up the new files by itself. [`ci.yml`](.github/workflows/ci.yml) builds and tests every push to `main`.
+
 ## ✦ Repo map
 
 ```
 unblurt/
+├── .github/workflows/  CI on every push; release builds on every v* tag
+├── scripts/          set-version, check-version, release-notes
 ├── apps/
 │   ├── desktop/          Tauri 2 + React popover app (macOS, Windows, Linux)
 │   │   ├── src/          React UI: popover, settings, modes and prompts

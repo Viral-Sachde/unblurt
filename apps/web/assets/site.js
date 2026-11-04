@@ -13,6 +13,22 @@
     document.querySelector(`.platform[data-os="${os}"]`)?.classList.add("mine");
   }
 
+  // ---------- download links: the matching file in the latest GitHub Release ----------
+  const assetLinks = document.querySelectorAll("a[data-asset]");
+  if (assetLinks.length) {
+    fetch("https://api.github.com/repos/Viral-Sachde/unblurt/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((rel) => {
+        assetLinks.forEach((a) => {
+          const re = new RegExp(a.dataset.asset);
+          const file = (rel.assets || []).find((f) => re.test(f.name));
+          if (file) a.href = file.browser_download_url;
+        });
+        document.querySelectorAll("[data-release-version]").forEach((el) => (el.textContent = rel.tag_name.replace(/^v/, "")));
+      })
+      .catch(() => {}); // links already point at the release page
+  }
+
   // ---------- reveal on scroll ----------
   const io = new IntersectionObserver(
     (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))),

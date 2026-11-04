@@ -34,7 +34,7 @@
     <section class="poster wrap">
       <div class="poster-top reveal">
         <h1 class="display">get it out.</h1>
-        <span class="label">Build 0.1.0<br />Beta</span>
+        <span class="label">Build <span data-release-version>0.1.0</span><br />Beta</span>
       </div>
       <figure class="panel reveal">
         <img src="assets/keys.svg" alt="Oversized keycaps: a teal command key, an orange shift key and a long white space bar." />
@@ -47,31 +47,31 @@
       </div>
     </section>
 
-    <!-- Release links: point these at your GitHub Releases (see README). -->
+    <!-- Release links: site.js swaps each data-asset link for the matching file in the latest GitHub Release; without JS they open the release page. -->
     <section class="section wrap" style="padding-top: 0">
       <div class="platforms">
         <article class="platform reveal" data-os="mac">
           <h3>macOS</h3>
           <p>macOS 11 or later. Lives in the menu bar. Asks for Accessibility once so it can copy and paste for you.</p>
           <div class="files">
-            <a href="#releases">Apple silicon <span>.dmg</span></a>
-            <a href="#releases">Intel <span>.dmg</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="aarch64\.dmg$">Apple silicon <span>.dmg</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="x64\.dmg$">Intel <span>.dmg</span></a>
           </div>
         </article>
         <article class="platform reveal" data-os="windows">
           <h3>Windows</h3>
           <p>Windows 10 and 11. Lives in the system tray. No admin rights needed for the per-user installer.</p>
           <div class="files">
-            <a href="#releases">Installer <span>.exe</span></a>
-            <a href="#releases">MSI package <span>.msi</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="-setup\.exe$">Installer <span>.exe</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="\.msi$">MSI package <span>.msi</span></a>
           </div>
         </article>
         <article class="platform reveal" data-os="linux">
           <h3>Linux</h3>
           <p>X11 desktops. On Wayland the popover works, but auto copy/paste may need a manual paste.</p>
           <div class="files">
-            <a href="#releases">AppImage <span>.AppImage</span></a>
-            <a href="#releases">Debian / Ubuntu <span>.deb</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="\.AppImage$">AppImage <span>.AppImage</span></a>
+            <a href="https://github.com/Viral-Sachde/unblurt/releases/latest" data-asset="\.deb$">Debian / Ubuntu <span>.deb</span></a>
           </div>
         </article>
       </div>
@@ -125,6 +125,10 @@
         <details>
           <summary>Which models work?</summary>
           <p>Anything opencode supports: Anthropic, OpenAI, Google, OpenRouter, GitHub Copilot, local models through Ollama or LM Studio, and more. Small fast models feel best, since rewrites are short.</p>
+        </details>
+        <details>
+          <summary>macOS or Windows warns me when I first open it</summary>
+          <p>The beta builds aren't signed with a paid Apple or Microsoft certificate yet, so the first launch gets a warning. On macOS, open System Settings, then Privacy &amp; Security, and click Open Anyway next to unblurt (or right-click the app and choose Open). On Windows, click More info, then Run anyway. You only do this once.</p>
         </details>
         <details>
           <summary>Why does macOS ask for Accessibility access?</summary>

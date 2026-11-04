@@ -38,7 +38,9 @@ jobs:
           else
             gh release create "$TAG" --draft --verify-tag --title "unblurt ${TAG}" --notes-file notes.md
           fi
-          echo "id=$(gh api repos/${{ github.repository }}/releases --jq ".[] | select(.tag_name == \"$TAG\") | .id")" >> "$GITHUB_OUTPUT"
+          id=$(gh release view "$TAG" --json databaseId --jq .databaseId)
+          if [ -z "$id" ]; then echo "could not find the release for $TAG"; exit 1; fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build (${{ matrix.name }})

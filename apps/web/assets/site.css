@@ -869,6 +869,7 @@ section { scroll-margin-top: 64px; }
 .try-delta { font-weight: 500; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 .try-delta b { color: var(--teal); font-weight: 600; }
 .try-output { margin: 0; background: var(--teal-tint); border-radius: var(--radius-md); padding: 13px 15px; font-size: 16px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.try-note { margin: -2px 0 0; padding: 0 4px; font-size: 12px; line-height: 1.4; color: var(--ink-faint); }
 .try-acts { display: flex; gap: 6px; flex-wrap: wrap; }
 .try-chip {
   border: 0; cursor: pointer; background: var(--stone-soft); color: var(--ink); border-radius: 10px;

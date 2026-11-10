@@ -1,5 +1,5 @@
 // The interactive bits on the home page:
-//   Try it        your own text, rewritten by api/try.js, plus a "how blurty" score scored right here
+//   Try it        your own text, tidied by a demo rewriter right here (no AI, nothing sent), plus a "how blurty" score
 //   Share card    a 1200x630 PNG of your score (your text is blurred on it), shared or saved
 //   Daily         blurt of the day: drag the line or press the real shortcut to unblur it
 //   Ticker, wall  "N unblurred this week" and the reviewed before/after wall (api/stats.js, api/wall.js)
@@ -52,7 +52,8 @@
   // ---------------------------------------------------------------- the score
   const FILLERS = /\b(basically|literally|actually|honestly|like|just|kinda|kind of|sorta|sort of|really|very|totally|so+|um+|uh+|anyway|i mean|you know|tbh|fr|lol|lmao|ngl|idk|ugh|omg)\b/gi;
   const SORRY = /\b(sorry|apologi[sz]e|apologies|my bad|sorry to bother)\b/gi;
-  const HEDGES = /\b(i think|i guess|i feel like|maybe|probably|prob|perhaps|hopefully|not sure|might be|just wanted to|no worries if not|no rush)\b/gi;
+  const HEDGES = /\b(i think|i guess|i feel like|not sure|just wanted to|no worries if not|no rush)\b/gi;
+  const SOFT = /\b(maybe|probably|prob|perhaps|hopefully|might be)\b/gi;
   const TXT = /\b(u|ur|bc|cuz|pls|plz|thx|tmrw|rn|gonna|wanna|gotta|lmk|q|asap|w\/e|smth|sth)\b/gi;
 
   function score(raw) {
@@ -63,6 +64,7 @@
     const fillers = count(FILLERS);
     const sorry = count(SORRY);
     const hedges = count(HEDGES);
+    const soft = count(SOFT);
     const txt = count(TXT);
     const shouty = count(/([?!])\1+/g);
     const lowerI = count(/(^|\s)i(\s|'|$)/g);
@@ -72,12 +74,12 @@
     const noEnd = /[a-z0-9]$/i.test(text) && words.length > 6 ? 1 : 0;
 
     const per = 100 / Math.max(words.length, 8);
-    const raw_ = (fillers * 2.2 + sorry * 3 + hedges * 2.4 + txt * 2.6 + shouty * 3 + lowerI * 1.6) * per + runOn * 14 + noCaps * 8 + noEnd * 5;
+    const raw_ = (fillers * 2.2 + sorry * 3 + hedges * 2.4 + soft * 1.1 + txt * 2.6 + shouty * 3 + lowerI * 1.6) * per + runOn * 14 + noCaps * 8 + noEnd * 5;
     // a soft curve: messy text climbs fast, but only a real wall of blurt gets near 99
     const s = Math.max(0, Math.min(99, Math.round(100 * (1 - Math.exp(-raw_ / 70)))));
 
     const flags = [
-      [fillers, "filler", "fillers"], [hedges, "hedge", "hedges"], [sorry, "sorry", "sorrys"], [txt, "txt-speak", "txt-speak"],
+      [fillers, "filler", "fillers"], [hedges + soft, "hedge", "hedges"], [sorry, "sorry", "sorrys"], [txt, "txt-speak", "txt-speak"],
       [shouty, "?!? pile", "?!? piles"], [runOn, "run-on", "run-ons"], [lowerI, "lowercase i", "lowercase i's"],
     ].filter(([n]) => n > 0).map(([n, one, many]) => ({ n, label: n === 1 ? one : many }));
     return { score: s, flags, words: words.length };
@@ -88,6 +90,99 @@
     s < 30 ? "a little blurry." :
     s < 55 ? "pretty blurty." :
     s < 80 ? "very blurty." : "full blurt.";
+
+  // ---------------------------------------------------------------- demo rewriter
+  // The Try it box runs entirely in the browser: no AI, no server, nothing leaves the page.
+  // Built-in blurts get their hand-written clean version; anything else gets a rule-based tidy-up
+  // (txt-speak, fillers, contractions, capitals, punctuation). The real app uses a real model.
+  const WORDS = {
+    u: "you", ur: "your", bc: "because", cuz: "because", coz: "because", pls: "please", plz: "please", thx: "thanks", ty: "thank you",
+    tmrw: "tomorrow", tmr: "tomorrow", rn: "right now", lmk: "let me know", prob: "probably", probs: "probably", gonna: "going to",
+    wanna: "want to", gotta: "have to", asap: "as soon as possible", smth: "something", sth: "something", bday: "birthday",
+    mins: "minutes", min: "minutes", hr: "hour", hrs: "hours", msg: "message", ppl: "people", abt: "about", w: "with", b4: "before",
+    mon: "Monday", tues: "Tuesday", tue: "Tuesday", weds: "Wednesday", wed: "Wednesday", thurs: "Thursday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday",
+    cant: "can't", dont: "don't", wont: "won't", isnt: "isn't", arent: "aren't", wasnt: "wasn't", werent: "weren't", didnt: "didn't",
+    doesnt: "doesn't", couldnt: "couldn't", shouldnt: "shouldn't", wouldnt: "wouldn't", havent: "haven't", hasnt: "hasn't",
+    im: "I'm", ive: "I've", youre: "you're", theyre: "they're", thats: "that's", whats: "what's", theres: "there's", heres: "here's",
+    recieve: "receive", tomorow: "tomorrow", definately: "definitely", seperate: "separate", untill: "until", alot: "a lot", wierd: "weird", occured: "occurred",
+  };
+  const DAYS = /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|june|july|august|september|october|november|december)\b/g;
+  const QWORD = /^(who|what|when|where|why|how|is|are|am|can|could|do|does|did|will|would|should|any|anyone|has|have|was|were)\b/i;
+
+  function tidy(t) {
+    return t
+      .replace(/[ \t]+/g, " ")
+      .replace(/ +([,.!?;:])/g, "$1")
+      .replace(/([,;:])(?=\S)/g, "$1 ")
+      .replace(/,\s*([.!?])/g, "$1")
+      .replace(/^[\s,;:]+/gm, "")
+      .replace(/([.!?])\s*,/g, "$1")
+      .trim();
+  }
+  function sentences(t) {
+    // capitals at sentence starts, "i" as "I", a full stop at the end of each line
+    return t.split("\n").map((line) => {
+      let l = line.trim();
+      if (!l) return "";
+      l = l.replace(/^sorry\s+(?=i\b)/i, "sorry, ");
+      // "..., can you call me" -> "... . Can you call me?"
+      l = l.replace(/,\s+((?:can|could|would|will|do|did|are|is) (?:you|we|someone|anyone)\b[^.!?]*)[.!?]?$/i, ". $1?");
+      // "have you had a chance to look at X, it would be great..." -> question, then the rest
+      l = l.replace(/^(have you had a chance to [^,.!?]+),\s*/i, "$1? ");
+      l = l.replace(/(^|[.!?]\s+)([a-z])/g, (m, a, c) => a + c.toUpperCase());
+      l = l.replace(/\bi\b/g, "I").replace(/\bi'(m|ve|ll|d)\b/g, "I'$1");
+      if (!/[.!?:)]$/.test(l)) l += ".";
+      return l;
+    }).join("\n");
+  }
+  function demoRewrite(raw, mode) {
+    const hand = BLURTS.find((b) => b[2].trim().toLowerCase() === raw.trim().toLowerCase());
+    if (hand && mode !== "fix") return hand[3];
+
+    let t = " " + raw.replace(/\r\n?/g, "\n") + " ";
+    t = t.replace(/([a-z])\1{2,}/gi, "$1"); // sooo -> so
+    t = t.replace(/\b(w\/)/gi, "with ");
+    t = t.replace(/\b[a-z0-9]+\b/gi, (w) => {
+      const lower = w.toLowerCase();
+      if (WORDS[lower] === undefined) return w;
+      if (lower === "idk") return w;
+      return WORDS[lower];
+    });
+    t = t.replace(DAYS, (d) => d[0].toUpperCase() + d.slice(1));
+    t = t.replace(/\bill\b(?= (be|do|send|check|call|text|get|let|make|try|have|come|see|look|pick|ping|take))/g, "I'll");
+    t = t.replace(/\blike (\d)/gi, "about $1").replace(/\bsuper (?=\w)/gi, "very ");
+    t = t.replace(/\btheir (?=(going|coming|not|here|there|on|in|at|always|still|already|probably|all|right|late|done)\b)/gi, "they're ");
+    t = t.replace(/\byour (?=(welcome|right|going|not|the best|late|done)\b)/gi, "you're ");
+    t = t.replace(/\bits (?=(a|been|not|going|okay|ok|fine|time|so|too|all|my|your|been)\b)/gi, "it's ");
+    t = t.replace(/\b(running|be|i'm|im) late (\d+ (?:minutes|hours?|min|mins))\b/gi, (m, a, n) => `${a} about ${n} late,`);
+    t = t.replace(/\bno rush but\b/gi, "no rush, but").replace(/(,|\bbut)\s*would be\b/gi, "$1 it would be").replace(/(^|[.!?]\s+)would be\b/gi, "$1it would be");
+    t = t.replace(/\b(?:i )?(?:just )?wanted to (?:check|see|ask) if (?:you|u) had a chance to\b/gi, "have you had a chance to");
+    // ?? and !! piles: a question stays a question, a statement gets a full stop
+    t = t.replace(/([^.!?\n]*?)[?!]{2,}/g, (m, clause) => clause + (QWORD.test(clause.trim().replace(/^(and|but|so|ok|okay|hey|hi)\s+/i, "")) ? "?" : "."));
+    t = t.replace(/\.{2,}/g, ".");
+
+    if (mode === "fix") {
+      t = t.replace(/\bidk\b/gi, "I don't know");
+      return sentences(tidy(t));
+    }
+
+    // Rephrase: drop the filler and the noise
+    t = t.replace(/^\s*(hey|hi|hello)?\s*(ok|okay)?\s*(so)\b,?/i, " ");
+    t = t.replace(/\b(basically|literally|honestly|actually|totally|kinda|kind of|sorta|sort of|just|really|tbh|fr|ngl|lol|lmao|omg|ugh|um+|uh+|idk|i mean|you know|anyway)\b/gi, "");
+    t = t.replace(/\b(could|would|should|can|will|maybe|was|is|it's|just|and|so)\s+like\b,?/gi, "$1").replace(/,\s*like,/gi, ",");
+    t = t.replace(/\bvery (very )+/gi, "very ").replace(/^\s*like\b,?\s*/i, " ");
+    if (mode === "shorter") {
+      t = t.replace(/\b(sorry,? ?)+(to bother you,?)?/gi, "");
+      t = t.replace(/\b(i think|i guess|i feel like|i was thinking|i was wondering if|just wanted to say|no worries if not|no rush,?( but)?|if that makes sense|for what it's worth)\b,?/gi, "");
+      t = t.replace(/\b(that|which) is\b/gi, "");
+      t = t.replace(/\b(in order to)\b/gi, "to").replace(/\bat this point in time\b/gi, "now").replace(/\bdue to the fact that\b/gi, "because");
+    } else {
+      t = t.replace(/\b(sorry,? ?){2,}/gi, "sorry ");
+      t = t.replace(/\b(i think|i guess|i feel like)\s+(?=(we|it|this|that|they|you|i|the)\b)/gi, "");
+      t = t.replace(/([.!?]\s+|^\s*)sorry,\s*(?=maybe|but)/gi, "$1");
+    }
+    return sentences(tidy(t));
+  }
 
   // ---------------------------------------------------------------- Try it
   const tryRoot = $(".try");
@@ -168,13 +263,6 @@
       msg.hidden = !html;
     };
     const download = '<a href="/download">Get the app</a>';
-    const ERRORS = {
-      slow: `Easy there, speed typist. You've hit this hour's demo limit. ${download} to unblur as much as you like.`,
-      busy: `The demo is busy right now. Try again in a minute, or ${download}.`,
-      offline: `The live demo is resting right now. Your score still works, and the app does this anywhere you type. ${download}.`,
-      long: "That's a lot of blurt. Keep it under 600 characters for the demo.",
-      refused: "That one couldn't be rewritten. Try different text.",
-    };
 
     async function run() {
       const text = input.value.trim();
@@ -184,35 +272,26 @@
       out.hidden = true;
       say("");
       work.hidden = false;
+      // a short, honest pause so the result lands like the app's popover
+      await new Promise((r) => setTimeout(r, reduced ? 0 : 520 + Math.min(600, text.length * 3)));
       try {
-        const r = await fetch("/api/try", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, mode }),
-        });
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok || !data.text) {
-          say(ERRORS[data.error] || `Something went sideways. Try again, or ${download}.`);
-          return;
-        }
-        el("output").textContent = data.text;
-        const after = score(data.text).score;
+        const result = demoRewrite(text, mode);
+        el("output").textContent = result;
+        const after = score(result).score;
         shared.after = after;
         const delta = el("delta");
         delta.innerHTML = "";
-        delta.append(`${shared.score}% → `);
+        delta.append(`${shared.score}% \u2192 `);
         const b = document.createElement("b");
         b.textContent = `${after}%`;
         delta.append(b, " blurt");
         out.hidden = false;
         copyBtn.textContent = "copy";
-        lastPair = { before: text, after: data.text, mode };
+        lastPair = { before: text, after: result, mode };
         wallBtn.disabled = false;
         wallBtn.textContent = "add to the wall";
-        bumpTicker();
+        countUnblur();
         if (matchMedia("(max-width: 860px)").matches) out.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
-      } catch {
-        say(`Couldn't reach the demo. Check your connection, or ${download}.`);
       } finally {
         work.hidden = true;
         tryRoot.classList.remove("busy");
@@ -406,7 +485,7 @@
       const key = `ub-daily-${today}`;
       if (offset === 0 && !store.get(key)) {
         store.set(key, "1");
-        fetch("/api/stats?daily=1").then((r) => r.json()).then((s) => s.week != null && setTicker(s.week)).catch(() => {});
+        countUnblur();
       }
     }
 
@@ -498,7 +577,10 @@
     t.append(b, ` ${n === 1 ? "message" : "messages"} unblurred on this site this week`);
     ticker.hidden = false;
   }
-  function bumpTicker() { if (weekCount != null) setTicker(weekCount + 1); }
+  // counts one unblur toward "this week" (Try it or blurt of the day); the server limits how often
+  function countUnblur() {
+    fetch("/api/stats?u=1").then((r) => r.json()).then((s) => s.week != null && setTicker(s.week)).catch(() => {});
+  }
   if (ticker) fetch("/api/stats").then((r) => r.json()).then((s) => setTicker(s.week)).catch(() => {});
 
   const wall = $("[data-wall]");

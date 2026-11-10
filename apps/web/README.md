@@ -11,10 +11,9 @@ apps/web/
 ├── privacy.html      Privacy policy (app + website)
 ├── terms.html        Terms of use
 ├── api/stats.js      Counters: visitors, total GitHub Release downloads, messages unblurred this week
-├── api/try.js        Try it box: rewrites visitor text with Claude (rate limited, needs ANTHROPIC_API_KEY + Redis)
 ├── api/wall.js       "Unblurred lately" wall: opt-in before/after pairs, reviewed before they show
 ├── api/_lib/store.js Upstash Redis helpers, rate limiting, same-site check (not a route)
-├── assets/play.js    Try it, the how-blurty score, share card, blurt of the day slider, ticker, wall
+├── assets/play.js    Try it (demo rewriter, no AI), how-blurty score, share card, blurt of the day, ticker, wall
 ├── robots.txt, sitemap.xml, site.webmanifest, llms.txt   SEO and crawler files
 └── assets/
     ├── site.css      All styles and design tokens
@@ -52,8 +51,8 @@ The Vercel project `unblurt` is connected to this GitHub repo with its root dire
 - **Legal pages:** if the app starts sending data anywhere new (analytics, updates, crash reports), update `privacy.html` in the same change.
 - **SEO:** each page's `<head>` has a canonical URL, Open Graph and Twitter tags, and JSON-LD (`SoftwareApplication`, plus `FAQPage` on /download built from the FAQ). If you change the FAQ, a title or a description, update the matching tags and JSON-LD, and bump `<lastmod>` in `sitemap.xml`.
 - **Interactive sections:** everything on the home page between the demo and the engine section that people can type into or drag is in `assets/play.js`. The 30 daily blurts are the `BLURTS` list at the top; No. 1 is 10 Nov 2026 and they cycle.
-- **Try it limits:** 600 characters, 8 tries per visitor per hour, `TRY_DAILY_CAP` (default 1500) per day for everyone. It refuses to run without Redis, because the limits live there.
+- **Try it is a demo:** `demoRewrite()` in `play.js` uses the hand-written clean version for the built-in blurts and rule-based tidying (txt-speak, fillers, contractions, capitals, punctuation) for anything else. No AI and no server call; the result says so.
 - **Reviewing the wall:** `node scripts/wall-review.mjs` lists what's waiting; `approve ID` or `reject ID`. The wall shows once 3 entries are approved. The token is `WALL_ADMIN_TOKEN` in `.env.local` and Vercel.
-- **Env vars:** `ANTHROPIC_API_KEY` (Try it), `KV_REST_API_URL` / `KV_REST_API_TOKEN` (from the Upstash integration), `WALL_ADMIN_TOKEN`, `RATE_SALT`, optional `TRY_DAILY_CAP` and `GITHUB_TOKEN`.
+- **Env vars:** `KV_REST_API_URL` / `KV_REST_API_TOKEN` (from the Upstash integration), `WALL_ADMIN_TOKEN`, `RATE_SALT`, optional `GITHUB_TOKEN`.
 - **Copy:** lowercase headlines, short sentences, and no em dashes.
 - **Shortcuts:** anything wrapped in `data-mod` shows `⌘` on macOS and `Ctrl` elsewhere.

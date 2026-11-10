@@ -1095,3 +1095,4 @@ section { scroll-margin-top: 64px; }
 
 /* footer links: a full tap target even for the short ones */
 .footer nav a { min-width: 40px; justify-content: center; }
+.try-note a { color: var(--teal); font-weight: 550; text-underline-offset: 2px; }

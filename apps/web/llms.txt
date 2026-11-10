@@ -1,0 +1,17 @@
+# unblurt
+
+> unblurt is a free, open-source AI writing shortcut for macOS, Windows and Linux. Select text in any app, press one shortcut (Cmd+Shift+Space on Mac, Ctrl+Shift+Space elsewhere), and get it back written properly: rephrased, shorter, fixed, drafted as an email or message, or replied to. It runs on your own machine through the opencode engine with the AI model you choose (Anthropic, OpenAI, Google, OpenRouter, GitHub Copilot, Ollama, LM Studio and more). There is no unblurt server and no account.
+
+Made by Viral Sachde. Free while in beta.
+
+## Pages
+
+- [Home](https://unblurt.me/): what unblurt does, the shortcut, the edge plate, the seven modes, privacy model
+- [Download](https://unblurt.me/download): installers for macOS (Apple silicon, Intel), Windows (.exe, .msi), Linux (AppImage, .deb), setup steps and FAQ
+- [Privacy policy](https://unblurt.me/privacy): no servers, no accounts, no tracking in the app
+- [Terms of use](https://unblurt.me/terms)
+
+## Source
+
+- [GitHub repository](https://github.com/Viral-Sachde/unblurt)
+- [Releases and changelog](https://github.com/Viral-Sachde/unblurt/releases)

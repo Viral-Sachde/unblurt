@@ -10,6 +10,8 @@ apps/web/
 ├── download.html     Per-OS download buttons, setup steps, FAQ
 ├── privacy.html      Privacy policy (app + website)
 ├── terms.html        Terms of use
+├── api/stats.js      Footer counters: visitors (Upstash Redis) and total GitHub Release downloads
+├── robots.txt, sitemap.xml, site.webmanifest, llms.txt   SEO and crawler files
 └── assets/
     ├── site.css      All styles and design tokens
     ├── site.js       Story scroll scene, demo + pointer, hero keycaps, edge blur, showreel, OS detection
@@ -44,5 +46,7 @@ The Vercel project `unblurt` is connected to this GitHub repo with its root dire
 - **Imagery:** don't edit `product-*.png` or `og.png` by hand. Change `brand/creatives/` and run `brand/creatives/render.sh`.
 - **Story scene:** `#story` is a tall track with a sticky stage. Scroll progress picks one of 7 beats (`data-beat` 0 to 6) and CSS does the rest. Captions live in `.story-caps`.
 - **Legal pages:** if the app starts sending data anywhere new (analytics, updates, crash reports), update `privacy.html` in the same change.
+- **SEO:** each page's `<head>` has a canonical URL, Open Graph and Twitter tags, and JSON-LD (`SoftwareApplication`, plus `FAQPage` on /download built from the FAQ). If you change the FAQ, a title or a description, update the matching tags and JSON-LD, and bump `<lastmod>` in `sitemap.xml`.
+- **Counters:** `/api/stats` reads `KV_REST_API_URL` / `KV_REST_API_TOKEN` from the Upstash integration. Without them, only the download count shows.
 - **Copy:** lowercase headlines, short sentences, and no em dashes.
 - **Shortcuts:** anything wrapped in `data-mod` shows `⌘` on macOS and `Ctrl` elsewhere.

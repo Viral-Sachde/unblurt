@@ -29,6 +29,24 @@
       .catch(() => {}); // links already point at the release page
   }
 
+  // ---------- footer counters: visitors (counted once per browser session) and total downloads ----------
+  const statEls = document.querySelectorAll("[data-stats]");
+  if (statEls.length) {
+    let first = false;
+    try { first = !sessionStorage.getItem("ub-seen"); sessionStorage.setItem("ub-seen", "1"); } catch {}
+    fetch(`/api/stats${first ? "?hit=1" : ""}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(({ visitors, downloads }) => {
+        const n = (v) => Number(v).toLocaleString("en-US");
+        const parts = [];
+        if (visitors != null) parts.push(`${n(visitors)} ${visitors === 1 ? "visitor" : "visitors"}`);
+        if (downloads != null) parts.push(`${n(downloads)} ${downloads === 1 ? "download" : "downloads"}`);
+        if (!parts.length) return;
+        statEls.forEach((el) => { el.textContent = parts.join(" · "); el.hidden = false; });
+      })
+      .catch(() => {}); // counters just stay hidden
+  }
+
   // ---------- reveal on scroll ----------
   const io = new IntersectionObserver(
     (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))),

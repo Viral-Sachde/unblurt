@@ -253,7 +253,7 @@ export function Settings() {
         <div className="settings-credit">
           <span className="muted small">{version ? `unblurt v${version}` : "unblurt"}</span>
           <span className="muted small">
-            <span aria-hidden="true">☕</span> All this technical bakajiki, built on kofooo by Viral Sachde.
+            <span aria-hidden="true">☕</span> All this technical bakajiki, built on koffooo by Viral Sachde.
           </span>
         </div>
         <button className="ghost" onClick={() => api.quit()}>

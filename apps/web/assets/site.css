@@ -809,3 +809,5 @@ section { scroll-margin-top: 64px; }
 .footer .brewed > span { margin-right: 2px; }
 .footer .brewed a { white-space: nowrap; color: var(--ink); font-weight: 550; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; min-height: 0; display: inline; }
 .footer .brewed a:hover { text-decoration-color: currentColor; }
+.footer .stats { display: block; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.footer .stats[hidden] { display: none; }

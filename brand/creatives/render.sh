@@ -15,7 +15,7 @@ shot() { # url size out
 echo "product shots"
 shot "product.html#message" 1200,720 product-message.png    # 5:3, site hero
 shot "product.html?tall#message" 640,800 product-message-tall.png  # portrait, site hero on phones
-for s in email rephrase fix reply; do
+for s in email rephrase fix reply plate; do
   shot "product.html#$s" 1200,840 "product-$s.png"          # 10:7, showreel cards
 done
 

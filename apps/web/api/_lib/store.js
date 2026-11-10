@@ -81,13 +81,17 @@ function send(res, status, data, cache = "no-store") {
   res.status(status).send(JSON.stringify(data));
 }
 
-// Same-site check for POSTs, so other sites can't spend the demo budget from their pages.
+// Same-site check for POSTs, so other sites can't post to the wall from their pages.
 function sameSite(req) {
   const origin = req.headers.origin || req.headers.referer || "";
   if (!origin) return true; // curl and older browsers; rate limits still apply
   try {
     const host = new URL(origin).hostname;
-    return host === "unblurt.me" || host === "www.unblurt.me" || host === "localhost" || host === "127.0.0.1" || host.endsWith(".vercel.app");
+    return (
+      host === "unblurt.me" || host === "www.unblurt.me" || host === "unblurt.vercel.app" ||
+      /^unblurt-[a-z0-9-]+-viral-sachdes-projects\.vercel\.app$/.test(host) || // this project's preview deploys only
+      host === "localhost" || host === "127.0.0.1"
+    );
   } catch {
     return false;
   }

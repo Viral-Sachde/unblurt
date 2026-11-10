@@ -1,5 +1,5 @@
 // GET /api/stats          -> { visitors, downloads, week }
-// GET /api/stats?hit=1    -> counts this visit first (the site calls this once per browser session)
+// GET /api/stats?hit=1    -> counts this visit first (once per browser session, at most 20 per visitor per hour)
 // GET /api/stats?u=1      -> counts one unblur (Try it demo or blurt of the day) toward this week's total,
 //                            at most 30 per visitor per hour
 //
@@ -40,9 +40,13 @@ async function downloads() {
 module.exports = async (req, res) => {
   const q = req.query || {};
   const week = weekKey();
-  const unblur = (q.u === "1" || q.daily === "1") && (await allow(`unblurt:rl:u:${visitorHash(req)}`, 30, 3600));
+  const who = visitorHash(req);
+  const [unblur, hit] = await Promise.all([
+    (q.u === "1" || q.daily === "1") && allow(`unblurt:rl:u:${who}`, 30, 3600),
+    q.hit === "1" && allow(`unblurt:rl:hit:${who}`, 20, 3600),
+  ]);
   const cmds = [
-    [q.hit === "1" ? "INCR" : "GET", "unblurt:visitors"],
+    [hit ? "INCR" : "GET", "unblurt:visitors"],
     [unblur ? "INCR" : "GET", week],
   ];
   if (unblur) cmds.push(["EXPIRE", week, 60 * 60 * 24 * 21]);

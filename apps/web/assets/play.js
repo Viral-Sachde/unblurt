@@ -198,11 +198,26 @@
     let shown = 0;
     let lastPair = null;
 
-    const setMode = (m) => {
+    const radios = $$(".try-modes [data-mode]");
+    const setMode = (m, focus) => {
       mode = m;
-      $$(".try-modes [data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.mode === m)));
+      radios.forEach((x) => {
+        const on = x.dataset.mode === m;
+        x.setAttribute("aria-checked", String(on));
+        x.tabIndex = on ? 0 : -1; // one tab stop for the group, arrows move inside it
+        if (on && focus) x.focus();
+      });
     };
-    $$(".try-modes [data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+    radios.forEach((b, i) => {
+      b.addEventListener("click", () => setMode(b.dataset.mode));
+      b.addEventListener("keydown", (e) => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        setMode(radios[(i + d + radios.length) % radios.length].dataset.mode, true);
+      });
+    });
+    setMode(mode);
 
     const animateNumber = (to) => {
       const from = shown;
@@ -316,7 +331,26 @@
     const hint = $("[data-plate-hint]");
     if (plate) {
       const touch = matchMedia("(hover: none)").matches;
-      if (touch && hint) hint.textContent = "Or tap the plate on the left: Rephrase, Shorter, or what you last copied.";
+      if (touch && hint) hint.textContent = "Or tap the plate on the left edge: Rephrase, Shorter, or what you last copied.";
+      else if (hint) hint.textContent = "Or hover the plate on the left edge, or drag any text from this page onto it.";
+
+      // slim tab until you need it: tap opens it on touch, tapping elsewhere closes it
+      const rail = $(".tp-rail", plate);
+      rail.addEventListener("click", (e) => {
+        if (!plate.classList.contains("open") && !plate.matches(":hover")) {
+          e.stopPropagation();
+          plate.classList.add("open");
+        }
+      }, true);
+      document.addEventListener("pointerdown", (e) => { if (!plate.contains(e.target)) plate.classList.remove("open"); });
+      // the first time it scrolls into view, it opens for a moment so people notice it
+      const peek = new IntersectionObserver(([en]) => {
+        if (!en.isIntersecting) return;
+        peek.disconnect();
+        setTimeout(() => plate.classList.add("open"), 500);
+        setTimeout(() => { if (!plate.matches(":hover")) plate.classList.remove("open"); }, 2600);
+      }, { threshold: 0.5 });
+      peek.observe(tryRoot);
       const take = (text, m) => {
         const t = String(text || "").trim().slice(0, 600);
         if (!t) return false;
@@ -535,6 +569,7 @@
       p = Math.max(0, Math.min(100, v));
       stage.style.setProperty("--p", p.toFixed(2));
       knob.setAttribute("aria-valuenow", String(Math.round(p)));
+      knob.setAttribute("aria-valuetext", p >= 99.5 ? "fully unblurred" : `${Math.round(p)}% unblurred`);
       stage.classList.toggle("at0", p < 4);
       stage.classList.toggle("past", p > 8);
       const done = p >= 99.5;
@@ -662,7 +697,39 @@
   function countUnblur() {
     fetch("/api/stats?u=1").then((r) => r.json()).then((s) => s.week != null && setTicker(s.week)).catch(() => {});
   }
-  if (ticker) fetch("/api/stats").then((r) => r.json()).then((s) => setTicker(s.week)).catch(() => {});
+  const numbers = $("[data-numbers]");
+  function fillNumbers(stats) {
+    if (!numbers) return;
+    let any = false;
+    for (const key of ["downloads", "visitors", "week"]) {
+      const cell = $(`[data-num="${key}"]`, numbers);
+      const v = stats[key];
+      if (!cell || v == null || (key === "week" && v < 1)) continue;
+      cell.hidden = false;
+      $("[data-count]", cell).dataset.to = String(v);
+      $("[data-count]", cell).textContent = fmt(reduced ? v : 0);
+      any = true;
+    }
+    if (!any) return;
+    numbers.hidden = false;
+    $$(".reveal", numbers).forEach((r) => r.classList.add("in"));
+    const run = () => $$("[data-count]", numbers).forEach((el) => {
+      const to = Number(el.dataset.to || 0);
+      if (reduced || !to) { el.textContent = fmt(to); return; }
+      const t0 = performance.now(), ms = 1100;
+      const step = (t) => {
+        const k = Math.min(1, (t - t0) / ms);
+        el.textContent = fmt(Math.round(to * (1 - Math.pow(1 - k, 3))));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+    const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.4 });
+    io.observe(numbers);
+  }
+  if (ticker || numbers) {
+    fetch("/api/stats").then((r) => r.json()).then((s) => { setTicker(s.week); fillNumbers(s); }).catch(() => {});
+  }
 
   const wall = $("[data-wall]");
   if (wall) {

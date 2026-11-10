@@ -10,7 +10,7 @@
   --stone-soft: #f6f2ec;
   --ink: #101010;
   --ink-soft: #57534d;
-  --ink-faint: #9a948b;
+  --ink-faint: #726c63; /* 5.2:1 on white, 4.7:1 on stone-soft (WCAG AA) */
   --paper: #ffffff;
   --line: rgba(16, 16, 16, 0.09);
 
@@ -935,8 +935,8 @@ section { scroll-margin-top: 64px; }
 
 .daily { background: var(--stone); padding: clamp(14px, 3.4vw, 48px); }
 .daily-stage {
-  --p: 0; position: relative; background: #fff; border-radius: var(--radius-lg); overflow: hidden;
-  padding: clamp(18px, 3vw, 36px) clamp(18px, 3.4vw, 44px) clamp(56px, 6vw, 72px);
+  --p: 0; position: relative; background: #fff; border-radius: var(--radius-lg); overflow: visible;
+  padding: clamp(18px, 3vw, 36px) clamp(18px, 3.4vw, 44px) clamp(26px, 3.6vw, 44px);
   box-shadow: 0 30px 70px -34px rgba(16, 16, 16, 0.4), 0 2px 6px rgba(16, 16, 16, 0.06);
   cursor: ew-resize; touch-action: pan-y; user-select: none; -webkit-user-select: none;
 }
@@ -956,14 +956,6 @@ section { scroll-margin-top: 64px; }
 .daily-messy::selection { background: none; }
 .daily-clean { color: var(--ink); clip-path: inset(-0.2em calc(100% - var(--p) * 1%) -0.2em -0.2em); }
 
-.daily-tag {
-  position: absolute; bottom: clamp(16px, 2.2vw, 24px); font-size: 11.5px; font-weight: 600; letter-spacing: 0.01em;
-  padding: 4px 9px; border-radius: 999px; transition: opacity 0.25s;
-}
-.daily-tag.before { right: clamp(18px, 3.4vw, 44px); background: var(--persimmon-tint); color: #c84b1d; }
-.daily-tag.after { left: clamp(18px, 3.4vw, 44px); background: var(--teal); color: #fff; opacity: 0; }
-.daily-stage.past .daily-tag.after { opacity: 1; }
-.daily-stage.done .daily-tag.before { opacity: 0; }
 
 .daily-line {
   position: absolute; top: 0; bottom: 0; left: calc(var(--p) * 1%); width: 2px; margin-left: -1px; pointer-events: none;
@@ -980,9 +972,7 @@ section { scroll-margin-top: 64px; }
 .daily-knob:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
 .daily-stage.drag .daily-knob { cursor: grabbing; transform: scale(1.08); background: var(--teal-deep); }
 .daily-stage:not(.drag):not(.anim) .daily-line, .daily-stage:not(.drag):not(.anim) .daily-knob { transition: left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s, opacity 0.3s; }
-.daily-stage.at0 .daily-knob { margin-left: 0; } /* keep the knob inside the card at the very start */
 .daily-stage.at0 .daily-line { opacity: 0; }
-.daily-stage.done .daily-knob { margin-left: -44px; }
 .daily-stage.done .daily-line { opacity: 0; }
 
 .daily-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: clamp(18px, 2.6vw, 30px); flex-wrap: wrap; }
@@ -995,7 +985,7 @@ section { scroll-margin-top: 64px; }
 .daily-foot .btn.ghost { background: #fff; min-height: 40px; }
 .daily-foot .btn.ghost:hover { background: var(--stone-soft); }
 @media (max-width: 600px) {
-  .daily { margin-inline: calc(var(--gutter) * -1); }
+  .daily { margin-inline: calc(var(--gutter) * -1); padding-inline: 22px; }
   .daily-stage { border-radius: 16px; }
   .daily-text p { font-size: clamp(22px, 6.6vw, 28px); }
   .daily-press { gap: 12px; }
@@ -1003,7 +993,6 @@ section { scroll-margin-top: 64px; }
   .daily-keys .cap.sp { min-width: 96px; font-size: 14.5px; }
   .daily-foot .btn { flex: 1 1 100%; justify-content: center; }
   .daily-knob { width: 40px; height: 40px; margin: -20px 0 0 -20px; }
-  .daily-stage.done .daily-knob { margin-left: -40px; }
 }
 @media (hover: none) { .daily-press p br { display: none; } }
 
@@ -1083,3 +1072,26 @@ section { scroll-margin-top: 64px; }
 .story-vis[data-beat="6"] .sv-plate { opacity: 1; transform: translate(0, -50%); transition-delay: 0.45s; }
 @media (max-height: 520px) and (orientation: landscape) { .sv-plate-tip { display: none; } }
 @media (max-width: 860px) { .try-plate { top: clamp(150px, 26vw, 220px); transform: none; } }
+
+/* the plate rests as a slim tab on the edge, like the app, and opens on hover, focus, tap or a drag */
+.tp-rail { transition: width 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.1), height 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.1), padding 0.24s, border-radius 0.24s, opacity 0.2s, transform 0.2s; overflow: hidden; }
+.tp-rail > * { transition: opacity 0.15s 0.08s; }
+.try-plate:not(.open):not(:hover):not(:focus-within) .tp-rail { width: 9px; height: 76px; padding: 0; gap: 0; border-radius: 0 8px 8px 0; background: var(--teal); cursor: pointer; }
+.try-plate:not(.open):not(:hover):not(:focus-within) .tp-rail::before { display: none; }
+.try-plate:not(.open):not(:hover):not(:focus-within) .tp-rail > * { opacity: 0; pointer-events: none; transition-delay: 0s; }
+/* a wider invisible edge so the slim tab is easy to hit */
+.try-plate::before { content: ""; position: absolute; left: 0; top: -20px; bottom: -20px; width: 44px; }
+
+/* ---------- live numbers ---------- */
+
+#numbers[hidden], .num[hidden] { display: none; }
+.numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; margin: 0; background: var(--line); border: 1px solid var(--line); }
+.num { background: #fff; padding: clamp(22px, 3vw, 34px) clamp(20px, 2.6vw, 30px) clamp(24px, 3vw, 36px); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.num dt { order: 2; margin-top: 10px; font-size: 16px; font-weight: 550; letter-spacing: -0.015em; }
+.num dd { display: contents; }
+.num b { order: 1; font-weight: 500; font-size: clamp(56px, 6.6vw, 96px); line-height: 0.92; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.num small { order: 3; font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; }
+.num:first-child b { color: var(--teal); }
+
+/* footer links: a full tap target even for the short ones */
+.footer nav a { min-width: 40px; justify-content: center; }

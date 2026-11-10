@@ -46,7 +46,7 @@
   <header class="nav">
     <div class="wrap">
       <a class="logo" href="/"><img src="assets/mark.svg" alt="" />unblurt</a>
-      <nav class="nav-links">
+      <nav class="nav-links" aria-label="Main">
         <a href="#try">Try it</a>
         <a href="#story">Story</a>
         <a href="#how">How it works</a>
@@ -334,6 +334,11 @@
           <p class="bottom">anywhere<br />you type.</p>
         </article>
         <article class="reel-card">
+          <div class="top"><h3>or just drag it.</h3><span class="no">The<br />plate</span></div>
+          <div class="art"><img src="assets/product-plate.png" alt="Selected text in a doc dragged onto the unblurt plate on the screen edge, and the popover showing a shorter version" loading="lazy" /></div>
+          <p class="bottom">drop it on<br />the plate.</p>
+        </article>
+        <article class="reel-card">
           <div class="top"><h3>messy thoughts.</h3><span class="no">Mode<br />Email</span></div>
           <div class="art"><img src="assets/product-email.png" alt="Email mode turning a few rough notes into a polite overdue-invoice email" loading="lazy" /></div>
           <p class="bottom">clear<br />writing.</p>
@@ -366,8 +371,6 @@
             <p class="daily-messy" data-daily="messy">ok so basically i think we prob cant hit friday bc design is still kinda moving?? maybe tues</p>
             <p class="daily-clean" data-daily="clean" aria-hidden="true">Friday is at risk because the designs are still changing. Tuesday looks realistic.</p>
           </div>
-          <span class="daily-tag before" aria-hidden="true">blurt</span>
-          <span class="daily-tag after" aria-hidden="true">unblurt</span>
           <div class="daily-line" aria-hidden="true"></div>
           <div class="daily-knob" data-daily="knob" role="slider" tabindex="0" aria-label="Unblur today's message" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6 3 10l4 4M13 6l4 4-4 4" /></svg>
@@ -486,6 +489,19 @@
       </div>
     </section>
 
+    <!-- Live numbers: downloads (GitHub Releases), visits and this week's unblurs (api/stats.js). Hidden until they load. -->
+    <section class="section wrap" id="numbers" data-numbers hidden style="padding-top: 0">
+      <div class="section-head reveal">
+        <h2 class="h2">so far.</h2>
+        <span class="label">Live numbers</span>
+      </div>
+      <dl class="numbers reveal">
+        <div class="num" data-num="downloads" hidden><dt>downloads</dt><dd><b data-count>0</b><small>every installer, every release</small></dd></div>
+        <div class="num" data-num="visitors" hidden><dt>visits to this site</dt><dd><b data-count>0</b><small>counted once per visit, nothing about you kept</small></dd></div>
+        <div class="num" data-num="week" hidden><dt>unblurred here this week</dt><dd><b data-count>0</b><small>Try it and blurt of the day, since Monday</small></dd></div>
+      </dl>
+    </section>
+
     <!-- Closing poster -->
     <section class="poster wrap">
       <div class="poster-top reveal">
@@ -505,7 +521,7 @@
   <footer class="footer">
     <div class="wrap">
       <a class="logo" href="/" style="font-size: 17px"><img src="assets/mark.svg" alt="" style="width: 22px; height: 22px" />unblurt</a>
-      <nav>
+      <nav aria-label="Footer">
         <a href="#how">How it works</a>
         <a href="/download">Download</a>
         <a href="/download#faq">FAQ</a>

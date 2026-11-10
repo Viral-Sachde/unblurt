@@ -198,12 +198,11 @@
     let shown = 0;
     let lastPair = null;
 
-    $$(".try-modes [data-mode]").forEach((b) =>
-      b.addEventListener("click", () => {
-        mode = b.dataset.mode;
-        $$(".try-modes [data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
-      }),
-    );
+    const setMode = (m) => {
+      mode = m;
+      $$(".try-modes [data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.mode === m)));
+    };
+    $$(".try-modes [data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
 
     const animateNumber = (to) => {
       const from = shown;
@@ -275,7 +274,9 @@
       // a short, honest pause so the result lands like the app's popover
       await new Promise((r) => setTimeout(r, reduced ? 0 : 520 + Math.min(600, text.length * 3)));
       try {
-        const result = demoRewrite(text, mode);
+        let result;
+        try { result = demoRewrite(text, mode); } catch { result = sentences(tidy(text)); }
+        if (!result || !result.trim()) result = sentences(tidy(text));
         el("output").textContent = result;
         const after = score(result).score;
         shared.after = after;
@@ -306,6 +307,86 @@
         run();
       }
     });
+
+
+    // ---------------------------------------------------------------- the plate
+    // Drag text from anywhere (this page, another tab, another app) onto the box and the plate opens
+    // into a drop target, like the real one on your screen edge. Its buttons work too.
+    const plate = $("[data-plate]");
+    const hint = $("[data-plate-hint]");
+    if (plate) {
+      const touch = matchMedia("(hover: none)").matches;
+      if (touch && hint) hint.textContent = "Or tap the plate on the left: Rephrase, Shorter, or what you last copied.";
+      const take = (text, m) => {
+        const t = String(text || "").trim().slice(0, 600);
+        if (!t) return false;
+        input.value = t;
+        shared.after = null;
+        rescore();
+        setMode(m);
+        plate.classList.remove("got");
+        void plate.offsetWidth;
+        plate.classList.add("got");
+        run();
+        return true;
+      };
+      const pageSelection = () => {
+        const sel = String(window.getSelection ? window.getSelection() : "").trim();
+        if (sel) return sel;
+        const a = input.selectionStart, b = input.selectionEnd;
+        return a !== b ? input.value.slice(a, b) : "";
+      };
+      $$("[data-plate-act]", plate).forEach((btn) =>
+        btn.addEventListener("click", async () => {
+          const act = btn.dataset.plateAct;
+          if (act === "clipboard") {
+            try {
+              if (take(await navigator.clipboard.readText(), "rephrase")) return;
+            } catch {}
+            say("Your browser kept the clipboard private. Paste into the box instead, and the plate takes it from there.");
+            input.focus();
+            return;
+          }
+          if (!take(pageSelection() || input.value, act)) {
+            say("Select some text first, or type into the box. Then the plate does the rest.");
+            input.focus();
+          }
+        }),
+      );
+
+      // drag and drop: anywhere on the Try it area counts, and the plate shows where it lands
+      let depth = 0;
+      const hasText = (e) => [...(e.dataTransfer?.types || [])].some((t) => t === "text/plain" || t === "text");
+      const reset = () => {
+        depth = 0;
+        tryRoot.classList.remove("dragging");
+        plate.classList.remove("over");
+      };
+      tryRoot.addEventListener("dragenter", (e) => {
+        if (!hasText(e)) return;
+        e.preventDefault();
+        depth++;
+        tryRoot.classList.add("dragging");
+      });
+      tryRoot.addEventListener("dragover", (e) => {
+        if (!hasText(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+        const r = plate.getBoundingClientRect();
+        plate.classList.toggle("over", e.clientX < r.right + 180);
+      });
+      tryRoot.addEventListener("dragleave", () => {
+        depth = Math.max(0, depth - 1);
+        if (!depth) reset();
+      });
+      tryRoot.addEventListener("drop", (e) => {
+        if (!hasText(e)) return;
+        e.preventDefault();
+        reset();
+        take(e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("text"), "rephrase");
+      });
+      addEventListener("dragend", reset);
+    }
 
     copyBtn.addEventListener("click", async () => {
       try {

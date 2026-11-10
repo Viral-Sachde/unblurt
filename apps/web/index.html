@@ -124,7 +124,7 @@
                 <p data-c="3">Add "make this sound normal". Send.</p>
                 <p data-c="4">Copy the answer.</p>
                 <p data-c="5">Switch back. Paste. Ten times a day.</p>
-                <p data-c="6">Now it's one shortcut, right where you typed.</p>
+                <p data-c="6">Now it's one shortcut, or one drag to the plate, right where you typed.</p>
               </div>
             </div>
 
@@ -149,6 +149,13 @@
                     <i class="sv-send"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" /></svg></i>
                   </div>
                 </div>
+                <div class="sv-plate" aria-hidden="true">
+                  <span class="es-rail">
+                    <i class="es-btn es-main"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h10.5M12 4.5l3 3-3 3" /><path d="M16 12.5H5.5M8 9.5l-3 3 3 3" /></svg></i>
+                    <i class="es-btn"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h12M4 10h8M4 14h5" /></svg></i>
+                  </span>
+                  <span class="sv-plate-tip">or drag it here</span>
+                </div>
                 <div class="sv-pop">
                   <div class="sv-pop-bar"><span><img src="assets/mark.svg" alt="" />unblurt</span><em>casual</em></div>
                   <div class="sv-pop-modes"><span>Rephrase</span><span>Email</span><span class="on">Message</span><span>Reply</span></div>
@@ -170,7 +177,7 @@
         </div>
         <div class="story-body reveal">
           <p>I did that dance ten times a day, for messages that took thirty seconds to think of.</p>
-          <p>Voice tools like Wispr Flow fixed this for speaking. I wanted the same thing for typing: no new tab, no prompt to write, no account to make. Select, press a shortcut, get it back sorted.</p>
+          <p>Voice tools like Wispr Flow fixed this for speaking. I wanted the same thing for typing: no new tab, no prompt to write, no account to make. Select, press a shortcut or drag it onto the plate on the edge of your screen, and get it back sorted.</p>
           <p>unblurt runs on the model you already use, on your own machine, and gets out of the way. It's open source and still early, so if something feels off, tell me on GitHub.</p>
         </div>
       </div>
@@ -234,6 +241,19 @@
         <span class="label">Try it</span>
       </div>
       <div class="try reveal">
+        <!-- the plate, like the one on your screen edge: drop text on it, or use its buttons -->
+        <div class="try-plate" data-plate>
+          <div class="tp-rail" role="toolbar" aria-label="The plate">
+            <button type="button" class="tp-btn main" data-plate-act="rephrase" data-tip="Rephrase" aria-label="Rephrase with the plate"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h10.5M12 4.5l3 3-3 3" /><path d="M16 12.5H5.5M8 9.5l-3 3 3 3" /></svg></button>
+            <button type="button" class="tp-btn" data-plate-act="shorter" data-tip="Shorter" aria-label="Make it shorter with the plate"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h12M4 10h8M4 14h5" /></svg></button>
+            <i class="tp-sep" aria-hidden="true"></i>
+            <button type="button" class="tp-btn" data-plate-act="clipboard" data-tip="Clipboard" aria-label="Unblurt what you last copied"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4" width="11" height="13" rx="2.5" /><path d="M7.5 4V3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V4" /><path d="M7.5 9h5M7.5 12h3.5" /></svg></button>
+          </div>
+          <div class="tp-drop" aria-hidden="true">
+            <img src="assets/mark.svg" alt="" />
+            <span><b>drop to unblurt</b><small>your original stays put</small></span>
+          </div>
+        </div>
         <div class="try-card">
           <div class="try-top">
             <span class="brand"><img src="assets/mark.svg" alt="" />unblurt</span>
@@ -265,6 +285,7 @@
             <span class="try-keys"><kbd><span data-mod>⌘</span></kbd><kbd>↵</kbd></span>
             <button class="btn primary small try-go" type="button" data-try="go">unblurt ↵</button>
           </div>
+          <p class="try-plate-hint" data-plate-hint>Or select any text on this page and drag it onto the plate on the left.</p>
         </div>
 
         <aside class="try-score" aria-label="How blurty is it?">
@@ -497,6 +518,6 @@
   </footer>
 
   <script src="assets/site.js"></script>
-  <script src="assets/play.js"></script>
+  <script src="assets/play.js?v=3"></script>
 </body>
 </html>

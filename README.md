@@ -4,7 +4,8 @@
 
 <p align="center">
   <b>Select text anywhere. Press one shortcut. Get it back written properly.</b><br />
-  A tiny desktop popover for every small writing job you used to open a chatbot for.
+  A tiny desktop popover for every small writing job you used to open a chatbot for.<br />
+  <a href="https://unblurt.me/#try"><b>Try it in your browser at unblurt.me</b></a>
 </p>
 
 <p align="center">
@@ -64,6 +65,10 @@
   <tr>
     <td width="50%"><img src="brand/creatives/product-reply.png" alt="Reply mode answering a DM" /><br /><sub><b>Reply</b> · their message plus your gist</sub></td>
     <td width="50%"><img src="brand/creatives/product-fix.png" alt="Fix mode correcting release notes" /><br /><sub><b>Fix</b> · spelling and grammar, your words kept</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="brand/creatives/product-message.png" alt="Message mode turning a messy Slack draft into a clear reply" /><br /><sub><b>Message</b> · a messy Slack draft, ready to send</sub></td>
+    <td width="50%"><img src="brand/creatives/product-plate.png" alt="Selected text dragged onto the plate on the screen edge" /><br /><sub><b>The plate</b> · drag text to the screen edge instead of using the shortcut</sub></td>
   </tr>
 </table>
 
@@ -142,12 +147,14 @@ Pushing the tag runs [`.github/workflows/release.yml`](.github/workflows/release
 ```
 unblurt/
 ├── .github/workflows/  CI on every push; release builds on every v* tag
-├── scripts/          set-version, check-version, release-notes
+├── scripts/          set-version, check-version, release-notes, wall-review (website wall moderation)
 ├── apps/
 │   ├── desktop/          Tauri 2 + React popover app (macOS, Windows, Linux)
 │   │   ├── src/          React UI: popover, settings, modes and prompts
 │   │   └── src-tauri/    Rust: hotkey, clipboard, keystrokes, opencode process
-│   └── web/              Marketing site: static HTML/CSS/JS, no build step
+│   └── web/              unblurt.me: static HTML/CSS/JS (no build step) plus three tiny API functions
+│                         for the live numbers and the visitor wall. Try it, the how-blurty score and
+│                         blurt of the day all run in the browser.
 └── brand/                Logo, app icon, tray icon, illustrations, creatives
     └── creatives/        Product shots, banner and social preview, rendered from HTML
 ```

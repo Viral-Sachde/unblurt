@@ -87,11 +87,9 @@ function sameSite(req) {
   if (!origin) return true; // curl and older browsers; rate limits still apply
   try {
     const host = new URL(origin).hostname;
-    return (
-      host === "unblurt.me" || host === "www.unblurt.me" || host === "unblurt.vercel.app" ||
-      /^unblurt-[a-z0-9-]+-viral-sachdes-projects\.vercel\.app$/.test(host) || // this project's preview deploys only
-      host === "localhost" || host === "127.0.0.1"
-    );
+    // this site, plus the URL of the deployment serving this request (the host's own system env)
+    const own = [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL].filter(Boolean);
+    return host === "unblurt.me" || host === "www.unblurt.me" || own.includes(host) || host === "localhost" || host === "127.0.0.1";
   } catch {
     return false;
   }

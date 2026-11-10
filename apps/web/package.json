@@ -1,0 +1,9 @@
+{
+  "name": "unblurt-web",
+  "private": true,
+  "description": "unblurt.me: static pages plus a few Vercel functions in api/",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0"
+  }
+}

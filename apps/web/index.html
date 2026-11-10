@@ -47,6 +47,7 @@
     <div class="wrap">
       <a class="logo" href="/"><img src="assets/mark.svg" alt="" />unblurt</a>
       <nav class="nav-links">
+        <a href="#try">Try it</a>
         <a href="#story">Story</a>
         <a href="#how">How it works</a>
         <a href="#modes">Modes</a>
@@ -226,6 +227,63 @@
       </div>
     </section>
 
+    <!-- Try it: rewrite your own text (api/try.js) and see how blurty it was (scored in the browser) -->
+    <section class="section wrap" id="try" style="padding-top: 0">
+      <div class="section-head reveal">
+        <h2 class="h2">your turn.<br />blurt something.</h2>
+        <span class="label">Try it</span>
+      </div>
+      <div class="try reveal">
+        <div class="try-card">
+          <div class="try-top">
+            <span class="brand"><img src="assets/mark.svg" alt="" />unblurt</span>
+            <button class="try-sample" type="button" data-try="sample">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5h2.2c1.4 0 2.3.6 3 1.7l1.6 2.6c.7 1.1 1.6 1.7 3 1.7H14M2 11.5h2.2c1.4 0 2.3-.6 3-1.7M10.4 4.5H14M12 2.5l2 2-2 2M12 9.5l2 2-2 2" /></svg>
+              give me a blurt
+            </button>
+          </div>
+          <div class="try-modes" role="radiogroup" aria-label="Mode">
+            <button type="button" role="radio" aria-checked="true" data-mode="rephrase">Rephrase</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="shorter">Shorter</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="fix">Fix</button>
+          </div>
+          <label class="sr-only" for="try-text">Your messy text</label>
+          <textarea id="try-text" class="try-input" data-try="input" rows="4" maxlength="600" spellcheck="false" autocomplete="off" placeholder="ok so basically i was thinking we could maybe push the thing to next week bc of the stuff??"></textarea>
+          <div class="try-work" data-try="working" hidden>untangling…</div>
+          <div class="try-out" data-try="result" hidden aria-live="polite">
+            <div class="try-sorted"><span>sorted.</span><span class="try-delta" data-try="delta"></span></div>
+            <p class="try-output" data-try="output"></p>
+            <div class="try-acts">
+              <button class="try-chip" type="button" data-try="copy">copy</button>
+              <button class="try-chip" type="button" data-try="wall">add to the wall</button>
+            </div>
+          </div>
+          <p class="try-msg" data-try="msg" hidden aria-live="polite"></p>
+          <div class="try-foot">
+            <span class="try-count" data-try="count">0 / 600</span>
+            <span class="try-keys"><kbd><span data-mod>⌘</span></kbd><kbd>↵</kbd></span>
+            <button class="btn primary small try-go" type="button" data-try="go">unblurt ↵</button>
+          </div>
+        </div>
+
+        <aside class="try-score" aria-label="How blurty is it?">
+          <span class="label">How blurty?</span>
+          <p class="try-pct"><b data-try="score">0</b><span>%</span></p>
+          <p class="try-verdict" data-try="verdict" aria-live="polite">type something messy</p>
+          <div class="try-meter" aria-hidden="true"><i data-try="meter"></i></div>
+          <ul class="try-flags" data-try="flags"></ul>
+          <div class="try-share">
+            <button class="btn ghost small" type="button" data-try="share" disabled>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10V2.5M5 5.2 8 2.3l3 2.9M3.5 8.5v4a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-4" /></svg>
+              Share my score
+            </button>
+            <button class="btn ghost small" type="button" data-try="save" disabled>Save card</button>
+          </div>
+        </aside>
+      </div>
+      <p class="live-ticker" data-ticker hidden><i aria-hidden="true"></i><span data-ticker-text></span></p>
+    </section>
+
     <!-- Showreel -->
     <section class="reel" aria-label="Showreel">
       <div class="wrap section-head">
@@ -267,6 +325,39 @@
         <button data-reel="next" aria-label="Next">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" /></svg>
         </button>
+      </div>
+    </section>
+
+    <!-- Blurt of the day: drag the line, or press the real shortcut, to unblur today's message (play.js) -->
+    <section class="section wrap" id="daily">
+      <div class="section-head reveal">
+        <h2 class="h2">blurt of<br />the day.</h2>
+        <span class="label" data-daily="no">Today</span>
+      </div>
+      <div class="daily reveal">
+        <div class="daily-stage" data-daily="stage" style="--p: 0">
+          <div class="daily-msg">
+            <span class="daily-av" aria-hidden="true"></span>
+            <div class="daily-who"><b data-daily="to">To your manager</b><small data-daily="ctx">Slack, 9:41</small></div>
+          </div>
+          <div class="daily-text">
+            <p class="daily-messy" data-daily="messy">ok so basically i think we prob cant hit friday bc design is still kinda moving?? maybe tues</p>
+            <p class="daily-clean" data-daily="clean" aria-hidden="true">Friday is at risk because the designs are still changing. Tuesday looks realistic.</p>
+          </div>
+          <span class="daily-tag before" aria-hidden="true">blurt</span>
+          <span class="daily-tag after" aria-hidden="true">unblurt</span>
+          <div class="daily-line" aria-hidden="true"></div>
+          <div class="daily-knob" data-daily="knob" role="slider" tabindex="0" aria-label="Unblur today's message" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6 3 10l4 4M13 6l4 4-4 4" /></svg>
+          </div>
+        </div>
+        <div class="daily-foot">
+          <div class="daily-press">
+            <span class="keycaps daily-keys" data-daily="keys" role="button" tabindex="0" aria-label="Unblur it"><span class="cap t"><span data-mod>⌘</span></span><span class="cap o">⇧</span><span class="cap sp">space</span></span>
+            <p data-daily="hint">Press it for real to unblur. <br />Or drag the line.</p>
+          </div>
+          <button class="btn ghost small" type="button" data-daily="next">Another one</button>
+        </div>
       </div>
     </section>
 
@@ -343,6 +434,15 @@
       </div>
     </section>
 
+    <!-- Wall: before/after pairs visitors chose to share from Try it, reviewed before they show (api/wall.js) -->
+    <section class="section wrap" id="wall" data-wall hidden style="padding-top: 0">
+      <div class="section-head reveal">
+        <h2 class="h2">unblurred<br />lately.</h2>
+        <span class="label">From visitors</span>
+      </div>
+      <div class="wall-grid" data-wall-grid></div>
+    </section>
+
     <hr class="rule" />
 
     <!-- Engine / privacy -->
@@ -396,5 +496,6 @@
   </footer>
 
   <script src="assets/site.js"></script>
+  <script src="assets/play.js"></script>
 </body>
 </html>

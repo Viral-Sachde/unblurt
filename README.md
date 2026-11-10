@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://unblurt.vercel.app"><img alt="Website" src="https://img.shields.io/badge/site-unblurt.vercel.app-0F6B6A?style=flat-square" /></a>
+  <a href="https://unblurt.me"><img alt="Website" src="https://img.shields.io/badge/site-unblurt.me-0F6B6A?style=flat-square" /></a>
   <a href="https://github.com/Viral-Sachde/unblurt/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Viral-Sachde/unblurt?style=flat-square&color=FF7A45&label=release" /></a>
   <img alt="Platforms" src="https://img.shields.io/badge/macOS%20·%20Windows%20·%20Linux-101010?style=flat-square" />
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square&logo=tauri&logoColor=white" />
@@ -96,7 +96,7 @@
 
 ## ✦ Download
 
-Installers for macOS (Apple silicon and Intel), Windows and Linux are on the [**Releases page**](https://github.com/Viral-Sachde/unblurt/releases/latest), and at [unblurt.vercel.app/download](https://unblurt.vercel.app/download). What changed in each version is in [`CHANGELOG.md`](CHANGELOG.md).
+Installers for macOS (Apple silicon and Intel), Windows and Linux are on the [**Releases page**](https://github.com/Viral-Sachde/unblurt/releases/latest), and at [unblurt.me/download](https://unblurt.me/download). What changed in each version is in [`CHANGELOG.md`](CHANGELOG.md).
 
 The beta builds aren't signed with a paid certificate yet. On first open, macOS needs **System Settings → Privacy & Security → Open Anyway**; Windows needs **More info → Run anyway**.
 

@@ -1,8 +1,8 @@
-# unblurt.vercel.app
+# unblurt.me
 
 The marketing site. Plain HTML, CSS and a little JS, with no framework and no build step.
 
-**Live:** https://unblurt.vercel.app
+**Live:** https://unblurt.me
 
 ```
 apps/web/
@@ -33,7 +33,7 @@ npx serve apps/web     # serve handles the clean URLs (/download, /privacy) like
 
 The Vercel project `unblurt` is connected to this GitHub repo with its root directory set to `apps/web`:
 
-- **Push to `main`** to deploy to production at unblurt.vercel.app.
+- **Push to `main`** to deploy to production at unblurt.me.
 - **Push any other branch** to get a preview URL.
 
 `.vercel/` and `.env.local` are created by `vercel link`. They're git-ignored, so don't commit them.

@@ -2,7 +2,7 @@
 
 > unblurt is a free, open-source AI writing shortcut for macOS, Windows and Linux. Select text in any app, press one shortcut (Cmd+Shift+Space on Mac, Ctrl+Shift+Space elsewhere), and get it back written properly: rephrased, shorter, fixed, drafted as an email or message, or replied to. It runs on your own machine through the opencode engine with the AI model you choose (Anthropic, OpenAI, Google, OpenRouter, GitHub Copilot, Ollama, LM Studio and more). There is no unblurt server and no account.
 
-Made by Viral Sachde. Free while in beta.
+Also known as: unblur, unblur app, unblurt.me. Made by Viral Sachde. Free while in beta.
 
 ## Pages
 
